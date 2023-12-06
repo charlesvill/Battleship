@@ -1,37 +1,97 @@
 const gameBoard = () => {
-  let grid = [];
   let ships = [];
-  // initializer for the grid
-  for(let i = 0; i < 10; i++){
-    grid[i] = [];
-    for(let j = 0; j < 10; j++){
-      grid[i][j] = null;
+  function gridMaker() {
+    grid = [];
+
+    for (let i = 0; i < 10; i++) {
+      grid[i] = [];
+      for (let j = 0; j < 10; j++) {
+        grid[i][j] = null;
+      }
     }
+    return grid;
   }
 
-  function shipFits(length, coordinates, orientation){
+  // initializer for the grid
+  let shipGrid = gridMaker();
+  let attacksReceived = gridMaker();
 
+  function shipFits(length, coordinates, orientation) {
     const r = coordinates[0];
     const c = coordinates[1];
     let space = 0;
 
     // h horizontal : v vertical
-    if(orientation = 'h'){
-      space = grid[0].length;
-    } else if(orientation = 'v'){
+    if ((orientation = "h")) {
+      space = shipGrid[0].length - 1 - c;
+    } else if ((orientation = "v")) {
+      space = shipGrid.length - 1 - r;
+    }
+    return space >= length ? true : false;
+  }
 
+  function pushtoGrid(ship, length, coordinates, offset) {
+    let current = coordinates;
+    for (let i = 0; i < length; i++) {
+      shipGrid[current[0]][current[1]] = ship;
+      current[0] += offset[0];
+      current[1] += offset[1];
     }
   }
 
-  function addShip(ship, coordinates){
+  function addShip(ship, coordinates, orientation) {
     const length = ship.length;
     const row = coordinates[0];
     const column = coordinates[1];
-    let orientation = 'v';
-    // check if a move is legal per the coordinate
-    grid[row][column] = ship;
+    ships.push(ship);
+
+    if (orientation === "h") {
+      if (shipFits(length, coordinates, "h")) {
+        pushtoGrid(ship, length, coordinates, [0, 1]);
+      }
+    } else if (orientation === "v") {
+      if (shipFits(length, coordinates, "h")) {
+        pushtoGrid(ship, length, coordinates, [1, 0]);
+      }
+    }
   }
-  return {grid, ships, addShip};
-}
+
+  function receiveAttack(coordinates) {
+    const r = coordinates[0];
+    const c = coordinates[1];
+
+    if (shipGrid[r][c] !== null) {
+      const ship = shipGrid[r][c];
+      attacksReceived[r][c] = 1;
+      const hitReport = ship.hit();
+
+      if(ship.isSunk() === true){
+        ships = ships.filter((element) => {
+          return element !== ship;
+        });
+        // send signal to check if there are any remaining ships? or 
+        // just a function that reports if there are ships remaining. 
+        return `${ship.type} has been sunk`;
+      } 
+      return hitReport;
+    }
+    // record the miss
+    attacksReceived[r][c] = 0;
+    return "miss";
+  }
+
+  function shipsRemaining(){
+    return ships.length > 0 ? ships.length : 'All ships have sunk';
+  }
+
+  return { shipGrid, attacksReceived, ships, shipFits, addShip, receiveAttack, shipsRemaining };
+};
+
+//
+//
+//make sure not to leave this global variable!
+//
+//
+
 const test = gameBoard();
 module.exports = gameBoard;
