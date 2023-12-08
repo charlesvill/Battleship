@@ -56,6 +56,14 @@ const gameBoard = () => {
     }
   }
 
+  function canStrike(coordinates) {
+    const r = coordinates[0];
+    const c = coordinates[1];
+    const strikeSquare = attacksReceived[r][c];
+
+    return strikeSquare === null ? attacksReceived[r][c] : false;
+  }
+
   function receiveAttack(coordinates) {
     const r = coordinates[0];
     const c = coordinates[1];
@@ -65,14 +73,14 @@ const gameBoard = () => {
       attacksReceived[r][c] = 1;
       const hitReport = ship.hit();
 
-      if(ship.isSunk() === true){
+      if (ship.isSunk() === true) {
         ships = ships.filter((element) => {
           return element !== ship;
         });
-        // send signal to check if there are any remaining ships? or 
-        // just a function that reports if there are ships remaining. 
+        // send signal to check if there are any remaining ships? or
+        // just a function that reports if there are ships remaining.
         return `${ship.type} has been sunk`;
-      } 
+      }
       return hitReport;
     }
     // record the miss
@@ -80,11 +88,20 @@ const gameBoard = () => {
     return "miss";
   }
 
-  function shipsRemaining(){
-    return ships.length > 0 ? ships.length : 'All ships have sunk';
+  function shipsRemaining() {
+    return ships.length > 0 ? ships.length : "All ships have sunk";
   }
 
-  return { shipGrid, attacksReceived, ships, shipFits, addShip, receiveAttack, shipsRemaining };
+  return {
+    shipGrid,
+    attacksReceived,
+    ships,
+    shipFits,
+    addShip,
+    canStrike,
+    receiveAttack,
+    shipsRemaining,
+  };
 };
 
 //

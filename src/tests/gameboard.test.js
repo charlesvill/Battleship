@@ -49,7 +49,7 @@ test("reports sunk ship", () => {
   expect(testBoard.receiveAttack([1, 5])).toBe('Frigate has been sunk');
 });
 
-test.skip("reports if all ships sunk", () => {
+test("reports if all ships sunk", () => {
   testBoard.receiveAttack([2, 2]);
   testBoard.receiveAttack([3, 2]);
   testBoard.receiveAttack([4, 2]);
