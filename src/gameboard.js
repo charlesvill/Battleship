@@ -57,11 +57,10 @@ const gameBoard = () => {
   }
 
   function canStrike(coordinates) {
-    const r = coordinates[0];
-    const c = coordinates[1];
+    const [r, c] = coordinates;
     const strikeSquare = attacksReceived[r][c];
 
-    return strikeSquare === null ? attacksReceived[r][c] : false;
+    return strikeSquare === null ? true : false;
   }
 
   function receiveAttack(coordinates) {
@@ -111,4 +110,6 @@ const gameBoard = () => {
 //
 
 const test = gameBoard();
+test.canStrike([1, 2]);
+
 module.exports = gameBoard;
