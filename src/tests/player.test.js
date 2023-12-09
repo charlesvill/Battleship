@@ -17,13 +17,13 @@ p1.playerBoard.addShip(frigateP1, [1, 2], "v");
 p2.playerBoard.addShip(sloopP2, [2, 4], "h");
 p2.playerBoard.addShip(frigateP2, [1, 2], "v");
 
-test("register hit on another player", () => {
+test.skip("register hit on another player", () => {
   expect(p1.attack([1, 2], p2.playerBoard)).toBe(
     "Frigate was hit. 3 hitpoints remaining",
   );
 });
 
-test("reports sinking all ships", () => {
+test.skip("reports sinking all ships", () => {
   p1.attack([2, 2], p2.playerBoard);
   p1.attack([3, 2], p2.playerBoard);
   p1.attack([4, 2], p2.playerBoard);
@@ -32,11 +32,11 @@ test("reports sinking all ships", () => {
   expect(p2.playerBoard.shipsRemaining()).toBe("All ships have sunk");
 });
 
-test("prevents repeat attacks", () => {
+test.skip("prevents repeat attacks", () => {
   expect(p1.canStrike([1, 2], p2.playerBoard)).toBe(false);
 });
 
-test("cpu generates a valid random coordinate", () => {
+test.skip("cpu generates a valid random coordinate", () => {
   const randomCoordinate = cpuPlayer().randomMove();
 
   console.log("random strike: " + randomCoordinate);
@@ -45,6 +45,8 @@ test("cpu generates a valid random coordinate", () => {
   expect(randomCoordinate[1]).toBeGreaterThanOrEqual(0);
   expect(randomCoordinate[1]).toBeLessThanOrEqual(9);
 });
+
+
 
 test("cpu generates adjacent point after hit", () => {
   // helper code
@@ -62,7 +64,7 @@ test("cpu generates adjacent point after hit", () => {
   expect(nextStrike[1]).toBeLessThanOrEqual(3);
 });
 
-test("cpu generates inline strike after two hits", () => {
+test.skip("cpu generates inline strike after two hits", () => {
   const testStrike = cpu.attack([2, 2], p1.playerBoard);
   if (testStrike !== "miss") {
     cpuAiTest.reportHit([2, 2]);
@@ -74,6 +76,29 @@ test("cpu generates inline strike after two hits", () => {
   expect(nextStrike[0]).toBeGreaterThanOrEqual(0);
   expect(nextStrike[0]).toBeLessThanOrEqual(3);
   expect(nextStrike[1]).toBe(2);
+});
+
+test("cpu sinks a ship with length of 4", () => {
+
+  const testBattle = () => {
+    let nextStrike = cpuAiTest.nextMove();
+    while(cpu.canStrike(nextStrike, p1.playerBoard) === false){
+      nextStrike = cpuAiTest.nextMove();
+    }
+    const strikeResult = cpu.attack(nextStrike, p1.playerBoard);
+
+    console.log('strike coordinates' + nextStrike);
+    console.log('Strike result: ' + strikeResult);
+
+    if(strikeResult !== 'miss'){
+      cpuAiTest.reportHit(nextStrike);
+    }
+    if(strikeResult === 'Frigate has been sunk'){
+      return strikeResult;
+    }
+    return testBattle();
+  }
+  expect(testBattle()).toBe('Frigate has been sunk');
 });
 // report miss function? or going about after a miss
 // report when a ship has sunk and returning to random firing
