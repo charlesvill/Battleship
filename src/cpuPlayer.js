@@ -98,7 +98,7 @@ const cpuPlayer = () => {
       state = "inline";
     }
   }
-  function reportMiss(coordinate){
+  function reportMiss(){
     streak = false;
   }
   // report miss function?
