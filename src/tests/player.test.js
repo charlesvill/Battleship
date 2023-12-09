@@ -51,6 +51,7 @@ test("cpu generates adjacent point after hit", () => {
   const testStrike = cpu.attack([1, 2], p1.playerBoard);
   if (testStrike !== "miss") {
     cpuAiTest.reportHit([1, 2]);
+    // reportHit needs to have the resuls of isSunk
   }
   const nextStrike = cpuAiTest.nextMove();
   console.log("adjacent strike: " + nextStrike);
@@ -65,6 +66,7 @@ test("cpu generates inline strike after two hits", () => {
   const testStrike = cpu.attack([2, 2], p1.playerBoard);
   if (testStrike !== "miss") {
     cpuAiTest.reportHit([2, 2]);
+    // reportHit needs to send the results of isSunk
   }
   const nextStrike = cpuAiTest.nextMove();
   console.log("inline strike: " + nextStrike);

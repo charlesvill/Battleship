@@ -59,9 +59,12 @@ const cpuPlayer = () => {
         pursuitAxis = 'v';
         return getNextInline(c2);
       }
-
     } else {
-
+      if(streak === false){
+        return getNextInline(hitArr[0]);
+      }
+      return getNextInline(hitArr[hitArr.length - 1]);
+      // condition if the last strike was a miss then start from the front of the list
       // take the last known hit and add to it
     }
   }
@@ -81,11 +84,12 @@ const cpuPlayer = () => {
     }
   }
   function reportHit(coordinate, isSunk) {
+    streak = true;
     if (isSunk === true) {
       hit = false;
-      streak = true;
       mode = "random";
       hitArr = [];
+      pursuitAxis = null;
     }
     hitArr.push(coordinate);
     if (hitArr.length === 1) {
@@ -94,8 +98,11 @@ const cpuPlayer = () => {
       state = "inline";
     }
   }
+  function reportMiss(coordinate){
+    streak = false;
+  }
   // report miss function?
-  return { randomMove, adjacentMove, inlineMove, nextMove, reportHit, hitArr };
+  return { randomMove, adjacentMove, inlineMove, nextMove, reportHit, reportMiss, hitArr };
 };
 const test = cpuPlayer();
 test.hitArr.push([1, 2]);
