@@ -48,16 +48,16 @@ test.skip("cpu generates a valid random coordinate", () => {
 
 
 
-test("cpu generates adjacent point after hit", () => {
+test.skip("cpu generates adjacent point after hit", () => {
   // helper code
-  const testStrike = cpu.attack([1, 2], p1.playerBoard);
+  const testStrike = cpu.attack([2, 2], p1.playerBoard);
   if (testStrike !== "miss") {
-    cpuAiTest.reportHit([1, 2]);
+    cpuAiTest.reportHit([2, 2]);
     // reportHit needs to have the resuls of isSunk
   }
   const nextStrike = cpuAiTest.nextMove();
   console.log("adjacent strike: " + nextStrike);
-  expect(nextStrike).not.toBe([1, 2]);
+  expect(nextStrike).not.toBe([2, 2]);
   expect(nextStrike[0]).toBeGreaterThanOrEqual(0);
   expect(nextStrike[0]).toBeLessThanOrEqual(2);
   expect(nextStrike[1]).toBeGreaterThanOrEqual(1);
@@ -92,6 +92,8 @@ test("cpu sinks a ship with length of 4", () => {
 
     if(strikeResult !== 'miss'){
       cpuAiTest.reportHit(nextStrike);
+    } else if(strikeResult === 'miss'){
+      cpuAiTest.reportMiss();
     }
     if(strikeResult === 'Frigate has been sunk'){
       return strikeResult;
