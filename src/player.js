@@ -1,6 +1,6 @@
 // this will demonstrate dependency injection with the needed methods for the player board and enemy board ref
 
-const player = (nationality, boardFn) => {
+const player = (nationality, boardFn, isCPU = "false") => {
   const playerBoard = boardFn;
 
   function canStrike(coordinates, enemyBoard) {
@@ -15,10 +15,9 @@ const player = (nationality, boardFn) => {
     return "try another attack";
   }
 
-  return { nationality, playerBoard, canStrike, attack };
+  return { nationality, playerBoard, canStrike, attack, isCPU };
 };
 
 module.exports = player;
-
 
 // the attack fn as of now does not work well with cpu player because it needs to be able to regenerate another move without leaving its current scope
