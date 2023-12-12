@@ -10,30 +10,12 @@ const cpu = require("./cpuPlayer");
 const gameModule = () => {
   // temporary initializers that will be wrapped in a function that will assign game elements
   // the output should be the playerclasses (player wrappper for cpu)
-
-  const p1 = player("Dk", gameBoard());
-  let p2 = player("UK", gameBoard(), true);
-  const cpuAI = cpu();
-  const sloopP1 = ship(2);
-  const frigateP1 = ship(4);
-  const sloopP2 = ship(2);
-  const frigateP2 = ship(4);
-  let currentPlayer = p1;
-  let gameOver = false;
-
-  p1.playerBoard.addShip(sloopP1, [2, 4], "h");
-  p1.playerBoard.addShip(sloopP1, [6, 4], "h");
-  p1.playerBoard.addShip(frigateP1, [3, 2], "v");
-  p2.playerBoard.addShip(sloopP2, [2, 4], "h");
-  p2.playerBoard.addShip(sloopP2, [8, 4], "h");
-  p2.playerBoard.addShip(frigateP2, [1, 2], "v");
-
   // the game initializer will use this function to build the player element
   const cpuPlayerWrapper = (playerClass, cpuAI, enemyBoard) => {
-    const isCPU = true;
+    playerClass.isCPU = true;
     function attack() {
       let nextStrike = cpuAI.nextMove();
-      while (playerClass.canStrike(nextStrike) === false) {
+      while (playerClass.canStrike(nextStrike, enemyBoard) === false) {
         nextStrike = cpuAI.nextMove();
       }
       const strikeResult = playerClass.attack(nextStrike, enemyBoard);
@@ -47,14 +29,32 @@ const gameModule = () => {
       }
     }
 
-    return { attack, isCPU, ...playerClass };
+    return {
+      attack,
+      isCPU: playerClass.isCPU,
+      playerBoard: playerClass.playerBoard,
+    };
   };
-  // helper code for the tests. needs to be refactored once game initializer is made
-  const tmp = p2;
-  p2 = cpuPlayerWrapper(p2, cpuAI, p1.enemyBoard);
 
-  // part of the game initializer
-  // helper code to override the assingmnet of the player so that the attack function call will funnel to the cpu player wrapper and correctly make a move on the part of the AI.
+  const cpuAI = cpu();
+  const sloopP1 = ship(2);
+  const frigateP1 = ship(4);
+  const sloopP2 = ship(2);
+  const frigateP2 = ship(4);
+  let gameOver = false;
+  const p1 = player("Dk", gameBoard());
+  let p2 = cpuPlayerWrapper(
+    player("UK", gameBoard(), true),
+    cpuAI,
+    p1.playerBoard,
+  );
+  let currentPlayer = p1;
+  p1.playerBoard.addShip(sloopP1, [2, 4], "h");
+  p1.playerBoard.addShip(sloopP1, [6, 4], "h");
+  p1.playerBoard.addShip(frigateP1, [3, 2], "v");
+  p2.playerBoard.addShip(sloopP2, [2, 4], "h");
+  p2.playerBoard.addShip(sloopP2, [8, 4], "h");
+  p2.playerBoard.addShip(frigateP2, [1, 2], "v");
 
   function uiInitializer() {}
   function endGame(winner) {
@@ -69,7 +69,7 @@ const gameModule = () => {
 
     if (currentPlayer === p1) {
       const strike = p1.attack(coordinates, p2.playerBoard);
-      if (p2.playerBoard.shipsRemaining() === 0) {
+      if (isNaN(p2.playerBoard.shipsRemaining())) {
         gameOver = true;
         return endGame(p1);
       }
@@ -86,6 +86,9 @@ const gameModule = () => {
       return gameLoop();
     }
   }
-  return { uiInitializer, gameLoop, gameOver };
+  function isGameOver() {
+    return gameOver;
+  }
+  return { uiInitializer, gameLoop, isGameOver };
 };
 module.exports = gameModule;
