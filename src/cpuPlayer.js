@@ -7,6 +7,7 @@ const cpuPlayer = () => {
   let hitArr = [];
   let pursuitAxis = null; 
 
+
   function randomMove() {
     const max = 10;
     const cCoord = Math.floor(Math.random() * max);
@@ -104,9 +105,6 @@ const cpuPlayer = () => {
   // report miss function?
   return { randomMove, adjacentMove, inlineMove, nextMove, reportHit, reportMiss, hitArr };
 };
-const test = cpuPlayer();
-test.hitArr.push([1, 2]);
-test.adjacentMove();
 module.exports = cpuPlayer;
 
 // attack on player class accepts a coordinate pair. how that pair gets formulated does not matter
