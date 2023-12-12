@@ -4,13 +4,9 @@ const gameBoard = require("./gameboard");
 const ship = require("./ship");
 const cpu = require("./cpuPlayer");
 
-// global variables for the dom such as the player variables and have events from the ui
-// call the gameModule and assign the game elements
-
 const gameModule = () => {
   // temporary initializers that will be wrapped in a function that will assign game elements
-  // the output should be the playerclasses (player wrappper for cpu)
-  // the game initializer will use this function to build the player element
+  // the game initializer will use this function to build the player element for cpu
   const cpuPlayerWrapper = (playerClass, cpuAI, enemyBoard) => {
     playerClass.isCPU = true;
     function attack() {
@@ -28,7 +24,6 @@ const gameModule = () => {
         return strikeResult;
       }
     }
-
     return {
       attack,
       isCPU: playerClass.isCPU,

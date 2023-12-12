@@ -27,22 +27,3 @@ test("gameLoop correctly handles input from mock UI & CPU player", () => {
 
   expect(mockUIinputTest()).toBe("game succesfully ended");
 });
-
-const mockUIinputTest = () => {
-  const mockPlayerGuesses = [
-    [1, 2],
-    [2, 2],
-    [3, 2],
-    [4, 2],
-    [8, 4],
-    [8, 5],
-    [2, 4],
-    [2, 5],
-  ];
-  while (!game.isGameOver()) {
-    // pulls first guess and sends it gameloop as its strike guess
-    // because gameModule uses recursion to trigger cpu turn
-    // it is not necessary to call a cpu turn
-    game.gameLoop(mockPlayerGuesses.shift());
-  }
-};
