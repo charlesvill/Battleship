@@ -1,16 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battleship</title>
-    <script src="./main.js" defer></script>
-</head>
-<body>
-    <div class="pageContainer">
-        <div class="title">Battleship</div>
-        <div class="playerSelectCont">
-           <form action="" class="playerForm">
+const userInterface = () => {
+  const pageContainer = document.querySelector(".pageContainer");
+  let p1Country = "";
+  let p2Country = "";
+
+  function initCountrySelect() {
+    const nodeList = docuement.querySelectorAll(".countryBox");
+    nodeList.forEach((element) => {
+      element.addEventListener("click", () => {
+        if (element.classList[1] === "p1") {
+          p1Country = element.id;
+        } else if (element.classList[1] === "p2") {
+          p2Country = element.id;
+        }
+      });
+    });
+  }
+  function startScreen(gameScriptFn) {
+    const htmlContent = `
+      <div class="title">Battleship</div>
+              <div class="playerSelectCont">
+                 <form action="" class="playerForm">
                       <div class="pSelect p1">
                           <div class="countryName p1"></div>
                           <div class="pTxt p1">Player 1</div>
@@ -55,10 +64,37 @@
                           <button type="submit">Begin</button>
                       </div>
                  </form>
-        </div>
-        <div class="footer">
-        </div>
 
-    </div>
-</body>
-</html>
+              </div>
+              <div class="footer">
+              </div>
+      `;
+    pageContainer.textContent = htmlContent;
+    const startBtn = document.querySelector('.startBtn');
+    initCountrySelect();
+    startBtn.addEventListener('click', () => {
+      gameInitializer(gameScriptFn);
+    });
+
+  }
+  // builds a playerobj that contains information to initialize the game
+  function gameInitializer(gameScriptFn) {
+    // build the obj and export to
+    const playerForm = document.querySelector('.playerForm');
+    const playerobj = {
+      player,
+      country
+    }
+    const player1 = playerobj;
+    const player2 = playerobj;
+
+    player1.player =
+  }
+  function UItoCoord() {}
+  function sendMove() {}
+  function checkSpace(coordinates) {}
+  startScreen();
+  return { gameInitializer, sendMove };
+};
+
+module.exports = userInterface;
