@@ -3,8 +3,10 @@ const player = require("./player");
 const gameBoard = require("./gameboard");
 const ship = require("./ship");
 const cpu = require("./cpuPlayer");
+const uiScript = require("./ui");
 
 const gameModule = () => {
+  console.log("greeting from index.js");
   // temporary initializers that will be wrapped in a function that will assign game elements
   // the game initializer will use this function to build the player element for cpu
   const cpuPlayerWrapper = (playerClass, cpuAI, enemyBoard) => {
@@ -31,6 +33,7 @@ const gameModule = () => {
     };
   };
 
+  const ui = uiScript();
   const cpuAI = cpu();
   const sloopP1 = ship(2);
   const frigateP1 = ship(4);
@@ -51,7 +54,6 @@ const gameModule = () => {
   p2.playerBoard.addShip(sloopP2, [8, 4], "h");
   p2.playerBoard.addShip(frigateP2, [1, 2], "v");
 
-  function uiInitializer() {}
   function endGame(winner) {
     // some shit here to end the game
     console.log("this mf over lol");
@@ -84,6 +86,7 @@ const gameModule = () => {
   function isGameOver() {
     return gameOver;
   }
-  return { uiInitializer, gameLoop, isGameOver };
+  return { gameLoop, isGameOver };
 };
+gameModule();
 module.exports = gameModule;
