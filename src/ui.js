@@ -86,7 +86,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       players.forEach((element) => {
         if (element.player === "person") {
           playerInitScript(element);
-          // shipScreen(element);
+          shipScreen(element);
         } else {
           playerInitScript(element);
           shipRandomizer(element);
@@ -109,7 +109,59 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     return coordinates;
   }
 
-  function shipScreen(player0bj) {}
+  function shipScreen(player0bj) {
+    // get reference to the page container and clear the page.
+    const htmlContent = `
+      <div class="shipScreenCont">
+          <div class="headerCont">
+              <div class="playerName">
+              </div>
+          </div>
+          <div class="bodyCont">
+              <div class="gridCont">
+
+              </div>
+              <div class="shipDisplayCont">
+                  this will be all boats listed and interactable
+              </div>
+          </div>
+          <div class="footerCont">
+              <div class="txt">
+                  Place your ships!
+              </div>
+          </div>
+      </div>
+     `;
+    pageContainer.innerHTML = "";
+    pageContainer.innerHTML = htmlContent;
+
+    // change info per the player obj
+
+    // store the html for the ship placement
+    const gridContainer = document.querySelector(".gridCont");
+    // build the visual grid
+    const gridSize = 10;
+
+    for (let i = 0; i < gridSize; i++) {
+      const row = document.createElement("div");
+      row.classList.add("rowCont");
+      gridContainer.appendChild(row);
+
+      for (let j = 0; j < gridSize; j++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.r = i;
+        cell.dataset.c = j;
+        row.appendChild(cell);
+      }
+    }
+
+    // create system for UI to coordinates
+    // hold reference to the grid elements
+    // activate event listener for each of the grid items
+    // create method for checking the coordinate space on a hover event
+    // create method for adding the ship to the location on the click event.
+  }
   function shipRandomizer(playerObj) {
     let shipArr = [...playerObj.ships];
     let player;
@@ -132,24 +184,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     });
   }
 
-  function shipPos(playerArr) {
-    // pass through the array of objects and shift each one and call a different function depending on if its a cpu or a person and route
-    let newPlayerArr = [];
-    while (playerArr.length > 0) {
-      const current = playerArr.shift();
-
-      if (current.player === "person") {
-        let tmpObj = shipScreen(current.player);
-        newPlayerArr.push(tmpObj);
-      } else {
-        let tmpObj = shipRandomizer(current.player);
-        newPlayerArr.push(tmpObj);
-      }
-    }
-
-    // call the game init fn passing the new player array
-    // call fn that goes to the actual play screen
-  }
   // builds a playerobj that contains information to initialize the game
   function pObjInitializer(gameScriptFn, formClssNme, p1selectid, p2selectid) {
     // build the obj and export to

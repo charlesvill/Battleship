@@ -23,7 +23,11 @@ const gameBoard = () => {
     const coffset = orientation === "v" ? 1 : 0;
 
     for (let i = 0; i < length; i++) {
-      if (shipGrid[r][c] !== null) {
+      try {
+        if (shipGrid[r][c] !== null) {
+          return false;
+        }
+      } catch (error) {
         return false;
       }
       r += roffset;
