@@ -1,0 +1,19 @@
+.cell{
+    display: flex;
+    flex-direction: row;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: whitesmoke;
+    border: solid black 1px;
+    padding:0;
+    margin:0;
+
+}
+.cell:hover{
+    background-color: khaki;
+}
+.rowCont{
+    display: flex;
+    flex-direction: row;
+    flex:1;
+}

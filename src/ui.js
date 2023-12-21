@@ -9,10 +9,8 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       element.addEventListener("click", () => {
         if (element.classList[1] === "p1") {
           p1Country = element.id;
-          console.log("p1 country added " + p1Country);
         } else if (element.classList[1] === "p2") {
           p2Country = element.id;
-          console.log("p2 country added " + p2Country);
         }
       });
     });
@@ -155,10 +153,17 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         row.appendChild(cell);
       }
     }
-
     // create system for UI to coordinates
     // hold reference to the grid elements
     // activate event listener for each of the grid items
+    const cells = document.querySelectorAll(".cell");
+    cells.forEach((cell) => {
+      cell.addEventListener("mouseover", (e) => {
+        const r = Number(e.currentTarget.dataset.r);
+        const c = Number(e.currentTarget.dataset.c);
+        const coord = [r, c];
+      });
+    });
     // create method for checking the coordinate space on a hover event
     // create method for adding the ship to the location on the click event.
   }
