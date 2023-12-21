@@ -6,7 +6,6 @@ const cpu = require("./cpuPlayer");
 const uiScript = require("./ui");
 
 const gameModule = () => {
-  console.log("greeting from index.js");
   // temporary initializers that will be wrapped in a function that will assign game elements
   // the game initializer will use this function to build the player element for cpu
   const cpuPlayerWrapper = (playerClass, cpuAI, enemyBoard) => {
@@ -33,7 +32,50 @@ const gameModule = () => {
     };
   };
 
-  const ui = uiScript();
+  function playerInitializer(playerObj) {
+    const isCPU = playerObj.player === "person" ? false : true;
+
+    if (playerObj.number === 1) {
+      player1 = player(playerObj.country, gameBoard(), isCPU);
+      console.log("this one p1");
+      console.log(playerObj);
+      console.log(player1);
+    } else {
+      player2 = player(playerObj.country, gameBoard(), isCPU);
+      console.log(player2);
+    }
+  }
+
+  function shipPlacerProxy(number, length, coordinates, orientation) {
+    // will make and place the ship
+    const player = number === 1 ? player1 : player2;
+    // first check the coordinates
+    // then make the ship
+    // then place the ship
+    const canFit = player.playerBoard.shipFits(
+      length,
+      coordinates,
+      orientation,
+    );
+    console.log("the coordinates sent fit: " + canFit + " " + orientation);
+    if (!canFit) {
+      return false;
+    }
+    const newShip = ship(length);
+    player.playerBoard.addShip(newShip, coordinates, orientation);
+
+    console.log(player.playerBoard.shipGrid);
+    return true;
+  }
+  function gameInitializer() {
+    // this will add the ships to the board;
+    // after adding the ships , it will need to check who is cpu and initialize the cpuwrapper
+  }
+
+  const ui = uiScript(shipPlacerProxy, playerInitializer, gameInitializer);
+  let player1 = undefined;
+  let player2 = undefined;
+  console.log(player1);
   const cpuAI = cpu();
   const sloopP1 = ship(2);
   const frigateP1 = ship(4);

@@ -1,4 +1,4 @@
-const userInterface = () => {
+const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
   const pageContainer = document.querySelector(".pageContainer");
   let p1Country = "";
   let p2Country = "";
@@ -76,35 +76,122 @@ const userInterface = () => {
     initCountrySelect();
     playerForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      gameInitializer(gameScriptFn, ".playerForm", "selectp1", "selectp2");
+      const players = pObjInitializer(
+        gameScriptFn,
+        ".playerForm",
+        "selectp1",
+        "selectp2",
+      );
+
+      players.forEach((element) => {
+        if (element.player === "person") {
+          playerInitScript(element);
+          // shipScreen(element);
+        } else {
+          playerInitScript(element);
+          shipRandomizer(element);
+        }
+      });
       // trigger the next screen
     });
   }
-  function shipScreen(playerOb) {}
+
+  function randomCoord() {
+    const max = 10;
+    const cCoord = Math.floor(Math.random() * max);
+    const rCoord = Math.floor(Math.random() * max);
+    const coordinates = [];
+
+    coordinates.push(cCoord, rCoord);
+
+    console.log("random coord: " + coordinates);
+
+    return coordinates;
+  }
+
+  function shipScreen(player0bj) {}
+  function shipRandomizer(playerObj) {
+    let shipArr = [...playerObj.ships];
+    let player;
+    shipArr.forEach((shipLength) => {
+      let placed = false;
+      while (!placed) {
+        // random direction of ship placement
+        const coordinates = randomCoord();
+        const random = Math.floor(Math.random() * 2);
+        const axis = random === 0 ? "h" : "v";
+
+        // shipMakerProxy returns false if was not able to place ship at random spot, trys again
+        placed = shipMakerProxy(
+          playerObj.number,
+          shipLength,
+          coordinates,
+          axis,
+        );
+      }
+    });
+  }
+
+  function shipPos(playerArr) {
+    // pass through the array of objects and shift each one and call a different function depending on if its a cpu or a person and route
+    let newPlayerArr = [];
+    while (playerArr.length > 0) {
+      const current = playerArr.shift();
+
+      if (current.player === "person") {
+        let tmpObj = shipScreen(current.player);
+        newPlayerArr.push(tmpObj);
+      } else {
+        let tmpObj = shipRandomizer(current.player);
+        newPlayerArr.push(tmpObj);
+      }
+    }
+
+    // call the game init fn passing the new player array
+    // call fn that goes to the actual play screen
+  }
   // builds a playerobj that contains information to initialize the game
-  function gameInitializer(gameScriptFn, formClssNme, p1selectid, p2selectid) {
+  function pObjInitializer(gameScriptFn, formClssNme, p1selectid, p2selectid) {
     // build the obj and export to
     const playerForm = document.querySelector(formClssNme);
     const dropdownfield1 = document.getElementById(p1selectid);
     const dropdownfield2 = document.getElementById(p2selectid);
     let players = [];
 
+    const manowar = 5;
+    const frigate = 4;
+    const schooner = 3;
+    const sloop = 2;
+
     const playerobj = {
       player: undefined,
-      countryBox: undefined,
+      number: undefined,
+      country: undefined,
+      ships: [
+        manowar,
+        frigate,
+        frigate,
+        schooner,
+        schooner,
+        schooner,
+        sloop,
+        sloop,
+      ],
     };
 
     const player1 = { ...playerobj };
     const player2 = { ...playerobj };
 
     player1.player = dropdownfield1.value;
-    player1.countryBox = p1Country;
+    player1.number = 1;
+    player1.country = p1Country;
 
     player2.player = dropdownfield2.value;
-    player2.countryBox = p2Country;
+    player2.number = 2;
+    player2.country = p2Country;
+
     players.push(player1, player2);
-    console.dir(player1);
-    console.dir(player2);
+
     return players;
   }
 
@@ -112,7 +199,7 @@ const userInterface = () => {
   function sendMove() {}
   function checkSpace(coordinates) {}
   startScreen();
-  return { gameInitializer, sendMove };
+  return { pObjInitializer, sendMove };
 };
 
 module.exports = userInterface;

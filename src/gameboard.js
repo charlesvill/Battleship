@@ -17,17 +17,19 @@ const gameBoard = () => {
   let attacksReceived = gridMaker();
 
   function shipFits(length, coordinates, orientation) {
-    const r = coordinates[0];
-    const c = coordinates[1];
-    let space = 0;
+    let r = coordinates[0];
+    let c = coordinates[1];
+    const roffset = orientation === "h" ? 0 : 1;
+    const coffset = orientation === "v" ? 1 : 0;
 
-    // h horizontal : v vertical
-    if ((orientation = "h")) {
-      space = shipGrid[0].length - 1 - c;
-    } else if ((orientation = "v")) {
-      space = shipGrid.length - 1 - r;
+    for (let i = 0; i < length; i++) {
+      if (shipGrid[r][c] !== null) {
+        return false;
+      }
+      r += roffset;
+      c += coffset;
     }
-    return space >= length ? true : false;
+    return true;
   }
 
   function pushtoGrid(ship, length, coordinates, offset) {

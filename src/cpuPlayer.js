@@ -5,8 +5,7 @@ const cpuPlayer = () => {
   let hit = false;
   let streak = false;
   let hitArr = [];
-  let pursuitAxis = null; 
-
+  let pursuitAxis = null;
 
   function randomMove() {
     const max = 10;
@@ -34,16 +33,16 @@ const cpuPlayer = () => {
     return adjacentStrike;
   }
 
-  function getNextInline(lastHit){
+  function getNextInline(lastHit) {
     // will need to guess next one until you have a legal one that hasnt been used yet
     const binaryOffset = Math.floor(Math.random() * 2);
     const offsetValue = binaryOffset === 0 ? -1 : 1;
     let inlineStrike = [...lastHit];
 
-    if(pursuitAxis === 'h'){
+    if (pursuitAxis === "h") {
       inlineStrike[1] += offsetValue;
       return inlineStrike;
-    } else if(pursuitAxis === 'v'){
+    } else if (pursuitAxis === "v") {
       inlineStrike[0] += offsetValue;
       return inlineStrike;
     }
@@ -51,17 +50,17 @@ const cpuPlayer = () => {
 
   function inlineMove() {
     // finds the axis by comparing hits and calls an inline guess
-    if(pursuitAxis === null){
+    if (pursuitAxis === null) {
       const [c1, c2] = hitArr;
-      if(c1[0] === c2[0] && c1[1] !== c2[1]){
-        pursuitAxis = 'h';
+      if (c1[0] === c2[0] && c1[1] !== c2[1]) {
+        pursuitAxis = "h";
         return getNextInline(c2);
-      } else if (c1[0] !== c2[0] && c1[1] === c2[1]){
-        pursuitAxis = 'v';
+      } else if (c1[0] !== c2[0] && c1[1] === c2[1]) {
+        pursuitAxis = "v";
         return getNextInline(c2);
       }
     } else {
-      if(streak === false){
+      if (streak === false) {
         return getNextInline(hitArr[0]);
       }
       return getNextInline(hitArr[hitArr.length - 1]);
@@ -99,11 +98,19 @@ const cpuPlayer = () => {
       state = "inline";
     }
   }
-  function reportMiss(){
+  function reportMiss() {
     streak = false;
   }
   // report miss function?
-  return { randomMove, adjacentMove, inlineMove, nextMove, reportHit, reportMiss, hitArr };
+  return {
+    randomMove,
+    adjacentMove,
+    inlineMove,
+    nextMove,
+    reportHit,
+    reportMiss,
+    hitArr,
+  };
 };
 module.exports = cpuPlayer;
 
