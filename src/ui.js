@@ -208,22 +208,19 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     //  });
 
     cells.forEach((cell) => {
-      let coordCalculated = false;
-
       const dragOverHandler = (e) => {
         e.preventDefault();
 
         cell.classList.add("mouseover");
 
-        if (!coordCalculated) {
-          r = Number(e.currentTarget.dataset.r);
-          c = Number(e.currentTarget.dataset.c);
-          coord = [r, c];
-          console.log(coord);
-          coordCalculated = true;
-          cell.removeEventListener("dragover", dragOverHandler);
-        }
+        r = Number(e.currentTarget.dataset.r);
+        c = Number(e.currentTarget.dataset.c);
+        coord = [r, c];
+        console.log(coord);
+        coordCalculated = true;
+        cell.removeEventListener("dragover", dragOverHandler);
       };
+      cell.addEventListener("dragover", dragOverHandler);
 
       cell.addEventListener("dragleave", (e) => {
         coordCalculated = false;
