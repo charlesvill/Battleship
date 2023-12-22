@@ -212,6 +212,9 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
 
       const dragOverHandler = (e) => {
         e.preventDefault();
+
+        cell.classList.add("mouseover");
+
         if (!coordCalculated) {
           r = Number(e.currentTarget.dataset.r);
           c = Number(e.currentTarget.dataset.c);
@@ -224,12 +227,23 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
 
       cell.addEventListener("dragleave", (e) => {
         coordCalculated = false;
+        cell.classList.remove("mouseover");
         cell.addEventListener("dragover", dragOverHandler);
       });
     });
 
+    const shipIMG = new Image();
+    shipIMG.src = "./images/sailboat.png";
+    shipIMG.classList.add("shipIMG");
+    shipIMG.style.width = "1rem";
+
     ships.forEach((ship) => {
-      ship.addEventListener("dragstart", () => {
+      ship.addEventListener("dragstart", (e) => {
+        const clone = ship.cloneNode(true);
+
+        // Set the offset for the drag image
+        const offsetX = 20; // Set your desired offset value
+        e.dataTransfer.setDragImage(clone, 0, 0);
         ship.classList.add("dragging");
       });
 

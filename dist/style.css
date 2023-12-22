@@ -17,6 +17,9 @@
 .cell:hover{
     background-color: khaki;
 }
+.mouseover{
+    background-color: khaki;
+}
 .rowCont{
     display: flex;
     flex-direction: row;
@@ -42,5 +45,7 @@
 .ship.dragging{
     opacity: .5;
 }
-
+.shipIMG{
+    background-color: transparent;
+}
 
