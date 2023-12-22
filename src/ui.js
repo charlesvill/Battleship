@@ -192,46 +192,49 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     let shipContainer = document.querySelector(".shipBox");
 
     const cells = document.querySelectorAll(".cell");
+    //  cells.forEach((cell) => {
+    //    cell.addEventListener("mouseover", (e) => {
+    //      r = Number(e.currentTarget.dataset.r);
+    //      c = Number(e.currentTarget.dataset.c);
+    //      coord = [r, c];
+    //      // const shipFits = shipMakerProxy(player0bj.number);
+    //    });
+    //  });
+    //  cells.forEach((cell) => {
+    //    cell.addEventListener("click", (e) => {
+    //      const orientation = orientationBtn.dataset.orientation;
+    //      console.log(`current orientation is ${orientation}`);
+    //    });
+    //  });
+
     cells.forEach((cell) => {
-      cell.addEventListener("mouseover", (e) => {
-        r = Number(e.currentTarget.dataset.r);
-        c = Number(e.currentTarget.dataset.c);
-        coord = [r, c];
-        // const shipFits = shipMakerProxy(player0bj.number);
-      });
-    });
-    cells.forEach((cell) => {
-      cell.addEventListener("click", (e) => {
-        const orientation = orientationBtn.dataset.orientation;
-        console.log(`current orientation is ${orientation}`);
-      });
-    });
-    ships.forEach((ship) => {
       let coordCalculated = false;
 
-      ship.addEventListener("dragstart", (e) => {
-        let selected = e.target;
-        console.log("1");
+      const dragOverHandler = (e) => {
+        e.preventDefault();
+        if (!coordCalculated) {
+          r = Number(e.currentTarget.dataset.r);
+          c = Number(e.currentTarget.dataset.c);
+          coord = [r, c];
+          console.log(coord);
+          coordCalculated = true;
+          cell.removeEventListener("dragover", dragOverHandler);
+        }
+      };
 
-        cells.forEach((cell) => {
-          const dragOverHandler = (e) => {
-            e.preventDefault();
-            if (!coordCalculated) {
-              r = Number(e.currentTarget.dataset.r);
-              c = Number(e.currentTarget.dataset.c);
-              coord = [r, c];
-              console.log(coord);
-              coordCalculated = true;
-              cell.removeEventListener("dragover", dragOverHandler);
-            }
-          };
+      cell.addEventListener("dragleave", (e) => {
+        coordCalculated = false;
+        cell.addEventListener("dragover", dragOverHandler);
+      });
+    });
 
-          cell.addEventListener("dragover", dragOverHandler);
-          cell.addEventListener("dragleave", (e) => {
-            dragOverHandler(e);
-            coordCalculated = false;
-          });
-        });
+    ships.forEach((ship) => {
+      ship.addEventListener("dragstart", () => {
+        ship.classList.add("dragging");
+      });
+
+      ship.addEventListener("dragend", () => {
+        ship.classList.remove("dragging");
       });
     });
 
