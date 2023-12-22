@@ -46,7 +46,13 @@ const gameModule = () => {
     }
   }
 
-  function shipPlacerProxy(number, length, coordinates, orientation) {
+  function shipPlacerProxy(
+    number,
+    length,
+    coordinates,
+    orientation,
+    checkonly = false,
+  ) {
     // will make and place the ship
     const player = number === 1 ? player1 : player2;
     // first check the coordinates
@@ -61,12 +67,15 @@ const gameModule = () => {
     if (!canFit) {
       return false;
     }
-    const newShip = ship(length);
-    player.playerBoard.addShip(newShip, coordinates, orientation);
+    if (!checkonly) {
+      const newShip = ship(length);
+      player.playerBoard.addShip(newShip, coordinates, orientation);
+      console.log(player.playerBoard.shipGrid);
+    }
 
-    console.log(player.playerBoard.shipGrid);
     return true;
   }
+
   function gameInitializer() {
     // this will add the ships to the board;
     // after adding the ships , it will need to check who is cpu and initialize the cpuwrapper

@@ -121,6 +121,24 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               </div>
               <div class="shipDisplayCont">
                   this will be all boats listed and interactable
+                <div class="shipBox">
+                    <div class="ship" draggable="true"></div>
+                </div>
+                <div class="shipBox">
+                    <div class="ship" draggable="true"></div>
+                </div>
+                <div class="shipBox">
+                    <div class="ship" draggable="true"></div>
+                </div>
+                <div class="shipBox">
+                    <div class="ship" draggable="true"></div>
+                </div>
+
+                  <div class="orientationCont">
+                    <button class="orientationBtn" data-orientation="h">
+                        Horizontal
+                    </button>
+                </div>
               </div>
           </div>
           <div class="footerCont">
@@ -154,22 +172,76 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       }
     }
     // create system for UI to coordinates
+    const orientationBtn = document.querySelector(".orientationBtn");
+    orientationBtn.addEventListener("click", (e) => {
+      const orientation = e.currentTarget.dataset.orientation;
+      if (orientation === "h") {
+        e.currentTarget.dataset.orientation = "v";
+        orientationBtn.textContent = "Vertical";
+      } else {
+        e.currentTarget.dataset.orientation = "h";
+        orientationBtn.textContent = "Horizontal";
+      }
+    });
     // hold reference to the grid elements
     // activate event listener for each of the grid items
+    let r = undefined;
+    let c = undefined;
+    let coord = [];
+    let ships = document.querySelectorAll(".ship");
+    let shipContainer = document.querySelector(".shipBox");
+
     const cells = document.querySelectorAll(".cell");
     cells.forEach((cell) => {
       cell.addEventListener("mouseover", (e) => {
-        const r = Number(e.currentTarget.dataset.r);
-        const c = Number(e.currentTarget.dataset.c);
-        const coord = [r, c];
+        r = Number(e.currentTarget.dataset.r);
+        c = Number(e.currentTarget.dataset.c);
+        coord = [r, c];
+        // const shipFits = shipMakerProxy(player0bj.number);
       });
     });
+    cells.forEach((cell) => {
+      cell.addEventListener("click", (e) => {
+        const orientation = orientationBtn.dataset.orientation;
+        console.log(`current orientation is ${orientation}`);
+      });
+    });
+    ships.forEach((ship) => {
+      let coordCalculated = false;
+
+      ship.addEventListener("dragstart", (e) => {
+        let selected = e.target;
+        console.log("1");
+
+        cells.forEach((cell) => {
+          const dragOverHandler = (e) => {
+            e.preventDefault();
+            if (!coordCalculated) {
+              r = Number(e.currentTarget.dataset.r);
+              c = Number(e.currentTarget.dataset.c);
+              coord = [r, c];
+              console.log(coord);
+              coordCalculated = true;
+              cell.removeEventListener("dragover", dragOverHandler);
+            }
+          };
+
+          cell.addEventListener("dragover", dragOverHandler);
+          cell.addEventListener("dragleave", (e) => {
+            dragOverHandler(e);
+            coordCalculated = false;
+          });
+        });
+      });
+    });
+
     // create method for checking the coordinate space on a hover event
     // create method for adding the ship to the location on the click event.
   }
+
   function shipRandomizer(playerObj) {
     let shipArr = [...playerObj.ships];
-    let player;
+
     shipArr.forEach((shipLength) => {
       let placed = false;
       while (!placed) {
