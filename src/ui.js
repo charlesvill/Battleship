@@ -122,16 +122,16 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               <div class="shipDisplayCont">
                   this will be all boats listed and interactable
                 <div class="shipBox">
-                    <div class="ship" draggable="true"></div>
+                    <div class="ship" data-index="5" draggable="true"></div>
                 </div>
                 <div class="shipBox">
-                    <div class="ship" draggable="true"></div>
+                    <div class="ship" data-index="4" draggable="true"></div>
                 </div>
                 <div class="shipBox">
-                    <div class="ship" draggable="true"></div>
+                    <div class="ship"  data-index="3" draggable="true"></div>
                 </div>
                 <div class="shipBox">
-                    <div class="ship" draggable="true"></div>
+                    <div class="ship"  data-index="2" draggable="true"></div>
                 </div>
 
                   <div class="orientationCont">
@@ -191,6 +191,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     let ships = document.querySelectorAll(".ship");
     let shipContainer = document.querySelector(".shipBox");
 
+    // current goal: event for dragover and release.
     const cells = document.querySelectorAll(".cell");
     //  cells.forEach((cell) => {
     //    cell.addEventListener("mouseover", (e) => {
@@ -216,11 +217,44 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         r = Number(e.currentTarget.dataset.r);
         c = Number(e.currentTarget.dataset.c);
         coord = [r, c];
+        const shipLength = e.currentTarget.dataset.index;
+        const orientBox = document.querySelector(".orientationBtn");
+        const shipOrientation = orientBox.dataset.orientation;
         console.log(coord);
+        const dragfits = shipMakerProxy(
+          playerObj.number,
+          shipLength,
+          coord,
+          shipOrientation,
+          true,
+        );
+        if (dragfits) {
+          // add clasname for fits
+          cell.classList.add("fits");
+          cell.classList.remove("notFits");
+        } else {
+          // add classname for not fits
+          cell.classList.add("notFits");
+          cell.classList.remove("fits");
+        }
         coordCalculated = true;
         cell.removeEventListener("dragover", dragOverHandler);
       };
       cell.addEventListener("dragover", dragOverHandler);
+      cell.addEventListener("dragend", (e) => {
+        // pass coordinates to grid checker
+        // color the square based on t/f result
+        const placed = shipMakerProxy(
+          playerObj.number,
+          shipLength,
+          coord,
+          shipOrientation,
+        );
+        if (placed) {
+          console.log("a ship was placed ");
+          // temp until visual indicator of placed ship
+        }
+      });
 
       cell.addEventListener("dragleave", (e) => {
         coordCalculated = false;
@@ -228,6 +262,9 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         cell.addEventListener("dragover", dragOverHandler);
       });
     });
+    // goal 1. event for dragend that marks location
+    // goal 2. check boat size on dragover
+    // goal 3. color space where ship would fit or not fit.
 
     const shipIMG = new Image();
     shipIMG.src = "./images/sailboat.png";
