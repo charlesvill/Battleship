@@ -20,10 +20,15 @@ const gameBoard = () => {
     let r = coordinates[0];
     let c = coordinates[1];
     const roffset = orientation === "h" ? 0 : 1;
-    const coffset = orientation === "v" ? 1 : 0;
+    const coffset = orientation === "v" ? 0 : 1;
+    if (length === undefined) {
+      throw new Error("shipfit length undefined");
+    }
 
     for (let i = 0; i < length; i++) {
       try {
+        console.log(shipGrid[r][c]);
+        console.log("coordinates checked: " + r + c);
         if (shipGrid[r][c] !== null) {
           return false;
         }

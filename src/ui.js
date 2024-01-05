@@ -107,7 +107,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     return coordinates;
   }
 
-  function shipScreen(player0bj) {
+  function shipScreen(playerObj) {
     // get reference to the page container and clear the page.
     const htmlContent = `
       <div class="shipScreenCont">
@@ -157,6 +157,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     const gridContainer = document.querySelector(".gridCont");
     // build the visual grid
     const gridSize = 10;
+    let dragShipLength = 0;
 
     for (let i = 0; i < gridSize; i++) {
       const row = document.createElement("div");
@@ -217,17 +218,22 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         r = Number(e.currentTarget.dataset.r);
         c = Number(e.currentTarget.dataset.c);
         coord = [r, c];
-        const shipLength = e.currentTarget.dataset.index;
         const orientBox = document.querySelector(".orientationBtn");
         const shipOrientation = orientBox.dataset.orientation;
+        console.log(shipOrientation);
         console.log(coord);
         const dragfits = shipMakerProxy(
           playerObj.number,
-          shipLength,
+          dragShipLength,
           coord,
           shipOrientation,
           true,
         );
+        console.log(dragfits);
+        // left off here
+        // does not seem to be checking coordinate well per the shipLength
+        // should also paint all squares and unpaint squares after dragend
+        // same should happen for new dragover
         if (dragfits) {
           // add clasname for fits
           cell.classList.add("fits");
@@ -246,7 +252,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         // color the square based on t/f result
         const placed = shipMakerProxy(
           playerObj.number,
-          shipLength,
+          dragShipLength,
           coord,
           shipOrientation,
         );
@@ -274,6 +280,8 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     ships.forEach((ship) => {
       ship.addEventListener("dragstart", (e) => {
         const clone = ship.cloneNode(true);
+        dragShipLength = e.currentTarget.dataset.index;
+        console.log("length: " + dragShipLength);
 
         // Set the offset for the drag image
         const offsetX = 20; // Set your desired offset value
