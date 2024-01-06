@@ -158,6 +158,10 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     // build the visual grid
     const gridSize = 10;
     let dragShipLength = 0;
+    let dragShip = undefined;
+    let dragFits = false;
+    let coordinates = undefined;
+    let orientation = "";
 
     for (let i = 0; i < gridSize; i++) {
       const row = document.createElement("div");
@@ -175,7 +179,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     // create system for UI to coordinates
     const orientationBtn = document.querySelector(".orientationBtn");
     orientationBtn.addEventListener("click", (e) => {
-      const orientation = e.currentTarget.dataset.orientation;
+      orientation = e.currentTarget.dataset.orientation;
       if (orientation === "h") {
         e.currentTarget.dataset.orientation = "v";
         orientationBtn.textContent = "Vertical";
@@ -192,22 +196,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     let ships = document.querySelectorAll(".ship");
     let shipContainer = document.querySelector(".shipBox");
 
-    // current goal: event for dragover and release.
     const cells = document.querySelectorAll(".cell");
-    //  cells.forEach((cell) => {
-    //    cell.addEventListener("mouseover", (e) => {
-    //      r = Number(e.currentTarget.dataset.r);
-    //      c = Number(e.currentTarget.dataset.c);
-    //      coord = [r, c];
-    //      // const shipFits = shipMakerProxy(player0bj.number);
-    //    });
-    //  });
-    //  cells.forEach((cell) => {
-    //    cell.addEventListener("click", (e) => {
-    //      const orientation = orientationBtn.dataset.orientation;
-    //      console.log(`current orientation is ${orientation}`);
-    //    });
-    //  });
 
     cells.forEach((cell) => {
       const dragOverHandler = (e) => {
@@ -222,20 +211,16 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         const shipOrientation = orientBox.dataset.orientation;
         console.log(shipOrientation);
         console.log(coord);
-        const dragfits = shipMakerProxy(
+        dragFits = shipMakerProxy(
           playerObj.number,
           dragShipLength,
           coord,
           shipOrientation,
           true,
         );
-        console.log(dragfits);
-        // left off here
-        // does not seem to be checking coordinate well per the shipLength
-        // should also paint all squares and unpaint squares after dragend
-        // same should happen for new dragover
-        if (dragfits) {
-          // add clasname for fits
+        if (dragFits) {
+          // add classname for fits
+          coordinates = coord;
           cell.classList.add("fits");
           cell.classList.remove("notFits");
         } else {
@@ -246,31 +231,16 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         coordCalculated = true;
         cell.removeEventListener("dragover", dragOverHandler);
       };
-      cell.addEventListener("dragover", dragOverHandler);
-      cell.addEventListener("dragend", (e) => {
-        // pass coordinates to grid checker
-        // color the square based on t/f result
-        const placed = shipMakerProxy(
-          playerObj.number,
-          dragShipLength,
-          coord,
-          shipOrientation,
-        );
-        if (placed) {
-          console.log("a ship was placed ");
-          // temp until visual indicator of placed ship
-        }
-      });
 
+      cell.addEventListener("dragover", dragOverHandler);
       cell.addEventListener("dragleave", (e) => {
         coordCalculated = false;
         cell.classList.remove("mouseover");
+        cell.classList.remove("notFits");
+        cell.classList.remove("fits");
         cell.addEventListener("dragover", dragOverHandler);
       });
     });
-    // goal 1. event for dragend that marks location
-    // goal 2. check boat size on dragover
-    // goal 3. color space where ship would fit or not fit.
 
     const shipIMG = new Image();
     shipIMG.src = "./images/sailboat.png";
@@ -280,8 +250,9 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     ships.forEach((ship) => {
       ship.addEventListener("dragstart", (e) => {
         const clone = ship.cloneNode(true);
-        dragShipLength = e.currentTarget.dataset.index;
+        dragShipLength = Number(e.currentTarget.dataset.index);
         console.log("length: " + dragShipLength);
+        dragShip = ship;
 
         // Set the offset for the drag image
         const offsetX = 20; // Set your desired offset value
@@ -291,6 +262,20 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
 
       ship.addEventListener("dragend", () => {
         ship.classList.remove("dragging");
+
+        if (dragFits) {
+          const placed = shipMakerProxy(
+            playerObj.number,
+            dragShipLength,
+            coord,
+            shipOrientation,
+          );
+          if (placed) {
+            console.log("a ship was placed ");
+            // temp until visual indicator of placed ship
+          }
+        }
+        dragShip = undefined;
       });
     });
 
