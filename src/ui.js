@@ -98,13 +98,11 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     const max = 10;
     const cCoord = Math.floor(Math.random() * max);
     const rCoord = Math.floor(Math.random() * max);
-    const coordinates = [];
+    const rancoordinates = [];
 
-    coordinates.push(cCoord, rCoord);
+    rancoordinates.push(cCoord, rCoord);
 
-    console.log("random coord: " + coordinates);
-
-    return coordinates;
+    return rancoordinates;
   }
 
   function shipScreen(playerObj) {
@@ -157,7 +155,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     let dragShipLength = 0;
     let dragShip = undefined;
     let dragFits = false;
-    let coordinates = undefined;
     let orientation = "h";
     let coord = [];
 
@@ -202,40 +199,48 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     ) => {
       const offsetr = orientation === "h" ? 0 : 1;
       const offsetc = orientation === "h" ? 1 : 0;
-      const addedClass = dragFits === true ? "fits" : "notFits";
+      let addedClass = "";
+
+      // 3 shading possiblities fits/nofits/placed
+      if (placed === true) {
+        addedClass = "placed";
+      } else {
+        addedClass = dragFits === true ? "fits" : "notFits";
+      }
+      console.log(`coord is ${coord}`);
+
       const currentCoord = [...coord];
       let cellCollection = [];
 
+      // shade each cell representing ship length
       for (let i = 0; i < length; i++) {
         const currentCell = document.querySelector(
           `[data-r="${currentCoord[0]}"][data-c="${currentCoord[1]}"]`,
         );
         cellCollection.push(currentCell);
+
         if (currentCell !== null) {
           currentCell.classList.add(`${addedClass}`);
         } else {
           continue;
         }
-        console.log(
-          `The coordinate ${currentCoord} should have got added with ${currentCell} element`,
-        );
         currentCoord[0] += offsetr;
         currentCoord[1] += offsetc;
       }
+      // after shade, dragleave handler to clear shading when not placed
       const firstCell = cellCollection[0];
-      if (firstCell === null || firstCell === undefined) {
-        console.log("there was no cell to revert classList");
+      if (firstCell === null || firstCell === undefined || placed === true) {
         return;
       }
       firstCell.addEventListener("dragleave", (e) => {
         e.preventDefault();
         cellCollection.forEach((element) => {
-          console.log(`class ${addedClass} being removed`);
           if (element !== null) {
             element.classList.remove(`${addedClass}`);
           }
         });
       });
+      console.log(`coord at the end is : ${coord}`);
     };
 
     const cells = document.querySelectorAll(".cell");
@@ -251,7 +256,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         const r = Number(e.currentTarget.dataset.r);
         const c = Number(e.currentTarget.dataset.c);
         coord = [r, c];
-        console.log(coord);
+        console.log(`coord before proxy: ${coord}`);
         dragFits = shipMakerProxy(
           playerObj.number,
           dragShipLength,
@@ -259,14 +264,13 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           orientation,
           true,
         );
+        console.log(`coord post shipmaker: ${coord}`);
         if (dragFits) {
           // add classname for fits
-          coordinates = coord;
-          gridShader(coordinates, dragShipLength, orientation, dragFits, false);
+          gridShader(coord, dragShipLength, orientation, dragFits, false);
         } else {
           // add classname for not fits
-          coordinates = coord;
-          gridShader(coordinates, dragShipLength, orientation, dragFits, false);
+          gridShader(coord, dragShipLength, orientation, dragFits, false);
         }
         coordCalculated = true;
         cell.removeEventListener("dragover", dragOverHandler);
@@ -302,14 +306,17 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         ship.classList.remove("dragging");
 
         if (dragFits) {
+          console.log(`coord before placing is : ${coord}`);
           const placed = shipMakerProxy(
             playerObj.number,
             dragShipLength,
             coord,
             orientation,
           );
+
+          console.log(`coord after placing is : ${coord}`);
           if (placed) {
-            console.log("a ship was placed ");
+            gridShader(coord, dragShipLength, orientation, dragFits, true);
             // trigger the function to color the tiles where ship is placed.
             // temp until visual indicator of placed ship
           }
@@ -329,7 +336,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       let placed = false;
       while (!placed) {
         // random direction of ship placement
-        const coordinates = randomCoord();
+        const rancoordinates = randomCoord();
         const random = Math.floor(Math.random() * 2);
         const axis = random === 0 ? "h" : "v";
 
@@ -337,7 +344,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         placed = shipMakerProxy(
           playerObj.number,
           shipLength,
-          coordinates,
+          rancoordinates,
           axis,
         );
       }
@@ -391,7 +398,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
 
   function UItoCoord() {}
   function sendMove() {}
-  function checkSpace(coordinates) {}
   startScreen();
   return { pObjInitializer, sendMove };
 };

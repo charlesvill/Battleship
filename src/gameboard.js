@@ -17,8 +17,9 @@ const gameBoard = () => {
   let attacksReceived = gridMaker();
 
   function shipFits(length, coordinates, orientation) {
-    let r = coordinates[0];
-    let c = coordinates[1];
+    const copyCoord = [...coordinates];
+    let r = copyCoord[0];
+    let c = copyCoord[1];
     const roffset = orientation === "h" ? 0 : 1;
     const coffset = orientation === "v" ? 0 : 1;
     if (length === undefined) {
@@ -42,7 +43,7 @@ const gameBoard = () => {
   }
 
   function pushtoGrid(ship, length, coordinates, offset) {
-    let current = coordinates;
+    let current = [...coordinates];
     for (let i = 0; i < length; i++) {
       shipGrid[current[0]][current[1]] = ship;
       current[0] += offset[0];
@@ -52,8 +53,6 @@ const gameBoard = () => {
 
   function addShip(ship, coordinates, orientation) {
     const length = ship.length;
-    const row = coordinates[0];
-    const column = coordinates[1];
     ships.push(ship);
 
     if (orientation === "h") {
