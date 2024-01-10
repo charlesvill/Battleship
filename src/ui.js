@@ -108,7 +108,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
   }
 
   function shipScreen(playerObj) {
-    // get reference to the page container and clear the page.
+    // clear page container and populate with ship select
     const htmlContent = `
       <div class="shipScreenCont">
           <div class="headerCont">
@@ -151,18 +151,20 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     pageContainer.innerHTML = "";
     pageContainer.innerHTML = htmlContent;
 
-    // change info per the player obj
-
-    // store the html for the ship placement
+    // necessary globals for methods in ship select
     const gridContainer = document.querySelector(".gridCont");
-    // build the visual grid
     const gridSize = 10;
     let dragShipLength = 0;
     let dragShip = undefined;
     let dragFits = false;
     let coordinates = undefined;
-    let orientation = "";
+    let orientation = "h";
+    let coord = [];
 
+    let ships = document.querySelectorAll(".ship");
+    let shipContainer = document.querySelector(".shipBox");
+
+    // build the visual grid
     for (let i = 0; i < gridSize; i++) {
       const row = document.createElement("div");
       row.classList.add("rowCont");
@@ -176,57 +178,95 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         row.appendChild(cell);
       }
     }
-    // create system for UI to coordinates
+
+    // cycle ship placement orientation, initialized to "h"
     const orientationBtn = document.querySelector(".orientationBtn");
     orientationBtn.addEventListener("click", (e) => {
-      orientation = e.currentTarget.dataset.orientation;
       if (orientation === "h") {
         e.currentTarget.dataset.orientation = "v";
+        orientation = "v";
         orientationBtn.textContent = "Vertical";
       } else {
         e.currentTarget.dataset.orientation = "h";
+        orientation = "h";
         orientationBtn.textContent = "Horizontal";
       }
     });
-    // hold reference to the grid elements
-    // activate event listener for each of the grid items
-    let r = undefined;
-    let c = undefined;
-    let coord = [];
-    let ships = document.querySelectorAll(".ship");
-    let shipContainer = document.querySelector(".shipBox");
+
+    const gridShader = (
+      coord,
+      length,
+      orientation,
+      dragFits,
+      placed = false,
+    ) => {
+      const offsetr = orientation === "h" ? 0 : 1;
+      const offsetc = orientation === "h" ? 1 : 0;
+      const addedClass = dragFits === true ? "fits" : "notFits";
+      const currentCoord = [...coord];
+      let cellCollection = [];
+
+      for (let i = 0; i < length; i++) {
+        const currentCell = document.querySelector(
+          `[data-r="${currentCoord[0]}"][data-c="${currentCoord[1]}"]`,
+        );
+        cellCollection.push(currentCell);
+        if (currentCell !== null) {
+          currentCell.classList.add(`${addedClass}`);
+        } else {
+          continue;
+        }
+        console.log(
+          `The coordinate ${currentCoord} should have got added with ${currentCell} element`,
+        );
+        currentCoord[0] += offsetr;
+        currentCoord[1] += offsetc;
+      }
+      const firstCell = cellCollection[0];
+      if (firstCell === null || firstCell === undefined) {
+        console.log("there was no cell to revert classList");
+        return;
+      }
+      firstCell.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        cellCollection.forEach((element) => {
+          console.log(`class ${addedClass} being removed`);
+          if (element !== null) {
+            element.classList.remove(`${addedClass}`);
+          }
+        });
+      });
+    };
 
     const cells = document.querySelectorAll(".cell");
 
+    // translates UI cell to a coordinate on a dragover event
+    // checks if the ship dragged will fit
     cells.forEach((cell) => {
       const dragOverHandler = (e) => {
         e.preventDefault();
 
         cell.classList.add("mouseover");
 
-        r = Number(e.currentTarget.dataset.r);
-        c = Number(e.currentTarget.dataset.c);
+        const r = Number(e.currentTarget.dataset.r);
+        const c = Number(e.currentTarget.dataset.c);
         coord = [r, c];
-        const orientBox = document.querySelector(".orientationBtn");
-        const shipOrientation = orientBox.dataset.orientation;
-        console.log(shipOrientation);
         console.log(coord);
         dragFits = shipMakerProxy(
           playerObj.number,
           dragShipLength,
           coord,
-          shipOrientation,
+          orientation,
           true,
         );
         if (dragFits) {
           // add classname for fits
           coordinates = coord;
-          cell.classList.add("fits");
-          cell.classList.remove("notFits");
+          gridShader(coordinates, dragShipLength, orientation, dragFits, false);
         } else {
           // add classname for not fits
-          cell.classList.add("notFits");
-          cell.classList.remove("fits");
+          coordinates = coord;
+          gridShader(coordinates, dragShipLength, orientation, dragFits, false);
         }
         coordCalculated = true;
         cell.removeEventListener("dragover", dragOverHandler);
@@ -236,8 +276,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       cell.addEventListener("dragleave", (e) => {
         coordCalculated = false;
         cell.classList.remove("mouseover");
-        cell.classList.remove("notFits");
-        cell.classList.remove("fits");
         cell.addEventListener("dragover", dragOverHandler);
       });
     });
@@ -268,10 +306,11 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             playerObj.number,
             dragShipLength,
             coord,
-            shipOrientation,
+            orientation,
           );
           if (placed) {
             console.log("a ship was placed ");
+            // trigger the function to color the tiles where ship is placed.
             // temp until visual indicator of placed ship
           }
         }
