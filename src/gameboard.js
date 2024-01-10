@@ -21,7 +21,7 @@ const gameBoard = () => {
     let r = copyCoord[0];
     let c = copyCoord[1];
     const roffset = orientation === "h" ? 0 : 1;
-    const coffset = orientation === "v" ? 0 : 1;
+    const coffset = orientation === "h" ? 1 : 0;
     if (length === undefined) {
       throw new Error("shipfit length undefined");
     }
@@ -56,12 +56,16 @@ const gameBoard = () => {
     ships.push(ship);
 
     if (orientation === "h") {
-      if (shipFits(length, coordinates, "h")) {
+      if (shipFits(length, coordinates, orientation)) {
         pushtoGrid(ship, length, coordinates, [0, 1]);
+      } else {
+        console.error("error: ship did not fit");
       }
     } else if (orientation === "v") {
-      if (shipFits(length, coordinates, "h")) {
+      if (shipFits(length, coordinates, orientation)) {
         pushtoGrid(ship, length, coordinates, [1, 0]);
+      } else {
+        console.error("error: ship did not fit");
       }
     }
   }

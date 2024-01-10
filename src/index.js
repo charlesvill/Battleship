@@ -37,12 +37,8 @@ const gameModule = () => {
 
     if (playerObj.number === 1) {
       player1 = player(playerObj.country, gameBoard(), isCPU);
-      console.log("this one p1");
-      console.log(playerObj);
-      console.log(player1);
     } else {
       player2 = player(playerObj.country, gameBoard(), isCPU);
-      console.log(player2);
     }
   }
 

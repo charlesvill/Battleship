@@ -312,6 +312,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             dragShipLength,
             coord,
             orientation,
+            false,
           );
 
           console.log(`coord after placing is : ${coord}`);
