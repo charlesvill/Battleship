@@ -58,3 +58,6 @@
 .placed {
   background-color: brown;
 }
+.depleted {
+  background-color: grey;
+}
