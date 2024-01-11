@@ -59,7 +59,6 @@ const gameModule = () => {
       coordinates,
       orientation,
     );
-    console.log("the coordinates sent fit: " + canFit + " " + orientation);
     if (!canFit) {
       return false;
     }
@@ -80,7 +79,6 @@ const gameModule = () => {
   const ui = uiScript(shipPlacerProxy, playerInitializer, gameInitializer);
   let player1 = undefined;
   let player2 = undefined;
-  console.log(player1);
   const cpuAI = cpu();
   const sloopP1 = ship(2);
   const frigateP1 = ship(4);

@@ -28,8 +28,6 @@ const gameBoard = () => {
 
     for (let i = 0; i < length; i++) {
       try {
-        console.log(shipGrid[r][c]);
-        console.log("coordinates checked: " + r + c);
         if (shipGrid[r][c] !== null) {
           return false;
         }
@@ -90,8 +88,7 @@ const gameBoard = () => {
         ships = ships.filter((element) => {
           return element !== ship;
         });
-        // send signal to check if there are any remaining ships? or
-        // just a function that reports if there are ships remaining.
+        // function that reports if there are ships remaining.
         return `${ship.type} has been sunk`;
       }
       return hitReport;
@@ -116,14 +113,5 @@ const gameBoard = () => {
     shipsRemaining,
   };
 };
-
-//
-//
-//make sure not to leave this global variable!
-//
-//
-
-const test = gameBoard();
-test.canStrike([1, 2]);
 
 module.exports = gameBoard;

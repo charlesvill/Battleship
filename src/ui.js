@@ -157,6 +157,10 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     let dragFits = false;
     let orientation = "h";
     let coord = [];
+    let mowCount = 1;
+    let frigCount = 2;
+    let schoonCount = 3;
+    let sloopCount = 2;
 
     let ships = document.querySelectorAll(".ship");
     let shipContainer = document.querySelector(".shipBox");
@@ -207,7 +211,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       } else {
         addedClass = dragFits === true ? "fits" : "notFits";
       }
-      console.log(`coord is ${coord}`);
 
       const currentCoord = [...coord];
       let cellCollection = [];
@@ -240,7 +243,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           }
         });
       });
-      console.log(`coord at the end is : ${coord}`);
     };
 
     const cells = document.querySelectorAll(".cell");
@@ -290,17 +292,48 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     shipIMG.style.width = "1rem";
 
     ships.forEach((ship) => {
-      ship.addEventListener("dragstart", (e) => {
-        const clone = ship.cloneNode(true);
+      const shipDragHandler = (e) => {
         dragShipLength = Number(e.currentTarget.dataset.index);
-        console.log("length: " + dragShipLength);
-        dragShip = ship;
+        let remainingShips = "";
+        switch (dragShipLength) {
+          case 5:
+            remainingShips = mowCount;
+            mowCount -= 1;
+            break;
+          case 4:
+            remainingShips = frigCount;
+            frigCount -= 1;
+            break;
+          case 3:
+            remainingShips = schoonCount;
+            schoonCount -= 1;
+            break;
+          case 2:
+            remainingShips = sloopCount;
+            sloopCount -= 1;
+            break;
+          default:
+            console.error("error: invalid ship length in dragShip");
+        }
+        if (remainingShips > 0) {
+          const clone = ship.cloneNode(true);
+          dragShip = ship;
+          // Set the offset for the drag image
+          const offsetX = 20; // Set your desired offset value
+          e.dataTransfer.setDragImage(clone, 0, 0);
+          ship.classList.add("dragging");
+          remainingShips -= 1;
+        }
+        if (remainingShips <= 0) {
+          console.log("no more ships remaining");
+          // add effect to grey out the ship
+          // remove the draghandler
+          ship.classList.add("depleted");
+          ship.removeEventListener("dragstart", shipDragHandler);
+        }
+      };
 
-        // Set the offset for the drag image
-        const offsetX = 20; // Set your desired offset value
-        e.dataTransfer.setDragImage(clone, 0, 0);
-        ship.classList.add("dragging");
-      });
+      ship.addEventListener("dragstart", shipDragHandler);
 
       ship.addEventListener("dragend", () => {
         ship.classList.remove("dragging");
@@ -318,8 +351,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           console.log(`coord after placing is : ${coord}`);
           if (placed) {
             gridShader(coord, dragShipLength, orientation, dragFits, true);
-            // trigger the function to color the tiles where ship is placed.
-            // temp until visual indicator of placed ship
           }
         }
         dragShip = undefined;
