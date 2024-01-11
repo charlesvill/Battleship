@@ -161,6 +161,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     let frigCount = 2;
     let schoonCount = 3;
     let sloopCount = 2;
+    let depletedShip = null;
 
     let ships = document.querySelectorAll(".ship");
     let shipContainer = document.querySelector(".shipBox");
@@ -326,10 +327,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         }
         if (remainingShips <= 0) {
           console.log("no more ships remaining");
-          // add effect to grey out the ship
-          // remove the draghandler
-          ship.classList.add("depleted");
-          ship.removeEventListener("dragstart", shipDragHandler);
+          depletedShip = ship;
         }
       };
 
@@ -351,6 +349,11 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           console.log(`coord after placing is : ${coord}`);
           if (placed) {
             gridShader(coord, dragShipLength, orientation, dragFits, true);
+            if (depletedShip != null) {
+              depletedShip.classList.add("depleted");
+              depletedShip.removeEventListener("dragstart", shipDragHandler);
+              depletedShip.draggable = false;
+            }
           }
         }
         dragShip = undefined;
