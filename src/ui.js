@@ -121,15 +121,20 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
                   this will be all boats listed and interactable
                 <div class="shipBox">
                     <div class="ship" data-index="5" draggable="true"></div>
+                    <span class="shipCount man" draggable="false"></span>
+
                 </div>
                 <div class="shipBox">
                     <div class="ship" data-index="4" draggable="true"></div>
+                    <span class="shipCount frig" draggable="false"></span>
                 </div>
                 <div class="shipBox">
                     <div class="ship"  data-index="3" draggable="true"></div>
+                    <span class="shipCount schoon" draggable="false"></span>
                 </div>
                 <div class="shipBox">
                     <div class="ship"  data-index="2" draggable="true"></div>
+                    <span class="shipCount sloop" draggable="false"></span>
                 </div>
 
                   <div class="orientationCont">
@@ -165,6 +170,15 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
 
     let ships = document.querySelectorAll(".ship");
     let shipContainer = document.querySelector(".shipBox");
+    let manCountBox = document.querySelector(".shipCount.man");
+    let frigCountBox = document.querySelector(".shipCount.frig");
+    let schoonCountBox = document.querySelector(".shipCount.schoon");
+    let sloopCountBox = document.querySelector(".shipCount.sloop");
+
+    manCountBox.textContent = `x ${mowCount}`;
+    frigCountBox.textContent = `x ${frigCount}`;
+    schoonCountBox.textContent = `x ${schoonCount}`;
+    sloopCountBox.textContent = `x ${sloopCount}`;
 
     // build the visual grid
     for (let i = 0; i < gridSize; i++) {
@@ -332,18 +346,26 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               case 5:
                 remainingShips = mowCount;
                 mowCount -= 1;
+                manCountBox.textContent = `x ${mowCount}`;
+
                 break;
               case 4:
                 remainingShips = frigCount;
                 frigCount -= 1;
+                frigCountBox.textContent = `x ${frigCount}`;
+
                 break;
               case 3:
                 remainingShips = schoonCount;
                 schoonCount -= 1;
+                schoonCountBox.textContent = `x ${schoonCount}`;
+
                 break;
               case 2:
                 remainingShips = sloopCount;
                 sloopCount -= 1;
+                sloopCountBox.textContent = `x ${sloopCount}`;
+
                 break;
               default:
                 console.error("error: invalid ship length in dragShip");
