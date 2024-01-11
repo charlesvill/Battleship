@@ -49,6 +49,9 @@ const gameModule = () => {
     orientation,
     checkonly = false,
   ) {
+    if (length === undefined || length === null || length === 0) {
+      return;
+    }
     // will make and place the ship
     const player = number === 1 ? player1 : player2;
     // first check the coordinates
