@@ -15,83 +15,48 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       });
     });
   }
-  function startScreen(gameScriptFn) {
-    const htmlContent = `
-      <div class="title">Battleship</div>
-              <div class="playerSelectCont">
-                 <form action="" class="playerForm">
-                      <div class="pSelect p1">
-                          <div class="countryName p1"></div>
-                          <div class="pTxt p1">Player 1</div>
-                          <div class="selectDropdown p1">
-                              <select id="selectp1" name="select">
-                                  <option value="person" selected>Player</option>
-                                  <option value="cpu">CPU</option>
-                              </select>
-                          </div>
-                          <div class="countrySelectCont p1">
-                              <div class="countryBox p1" id="Germany">DE</div>
-                              <div class="countryBox p1" id="Denmark">DK</div>
-                              <div class="countryBox p1" id="UK">UK</div>
-                              <div class="countryBox p1" id="Portugal">PT</div>
-                              <div class="countryBox p1" id="Spain">PT</div>
-                              <div class="countryBox p1" id="Italy">PT</div>
-                              <div class="countryBox p1" id="French">PT</div>
-                              <div class="countryBox p1" id="Dutch">PT</div>
-                          </div>
-                      </div>
-                      <div class="pSelect p2">
-                          <div class="countryName p2"></div>
-                          <div class="pTxt p2">Player 1</div>
-                          <div class="selectDropdown p2">
-                              <select id="selectp2" name="select">
-                                  <option value="person" selected>Player</option>
-                                  <option value="cpu">CPU</option>
-                              </select>
-                          </div>
-                          <div class="countrySelectCont p2">
-                              <div class="countryBox p2" id="Germany">DE</div>
-                              <div class="countryBox p2" id="Denmark">DK</div>
-                              <div class="countryBox p2" id="UK">UK</div>
-                              <div class="countryBox p2" id="Portugal">PT</div>
-                              <div class="countryBox p2" id="Spain">PT</div>
-                              <div class="countryBox p2" id="Italy">PT</div>
-                              <div class="countryBox p2" id="French">PT</div>
-                              <div class="countryBox p2" id="Dutch">PT</div>
-                          </div>
-                      </div>
-                      <div class="btnCont">
-                          <button type="submit">Begin</button>
-                      </div>
-                 </form>
 
-              </div>
-              <div class="footer">
-              </div>
-      `;
-    pageContainer.innerHTML = htmlContent;
-    const playerForm = document.querySelector(".playerForm");
-    initCountrySelect();
-    playerForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const players = pObjInitializer(
-        gameScriptFn,
-        ".playerForm",
-        "selectp1",
-        "selectp2",
-      );
+  // builds a playerobj that contains information to initialize the game
+  function pObjInitializer(gameScriptFn, formClssNme, p1selectid, p2selectid) {
+    const playerForm = document.querySelector(formClssNme);
+    const dropdownfield1 = document.getElementById(p1selectid);
+    const dropdownfield2 = document.getElementById(p2selectid);
+    let players = [];
 
-      players.forEach((element) => {
-        if (element.player === "person") {
-          playerInitScript(element);
-          shipScreen(element);
-        } else {
-          playerInitScript(element);
-          shipRandomizer(element);
-        }
-      });
-      // trigger the next screen
-    });
+    const manowar = 5;
+    const frigate = 4;
+    const schooner = 3;
+    const sloop = 2;
+
+    const playerobj = {
+      player: undefined,
+      number: undefined,
+      country: undefined,
+      ships: [
+        manowar,
+        frigate,
+        frigate,
+        schooner,
+        schooner,
+        schooner,
+        sloop,
+        sloop,
+      ],
+    };
+    const player1 = { ...playerobj };
+    const player2 = { ...playerobj };
+
+    player1.player = dropdownfield1.value;
+    player1.number = 1;
+    player1.country = p1Country;
+
+    player2.player = dropdownfield2.value;
+    player2.number = 2;
+    player2.country = p2Country;
+
+    players.push(player1, player2);
+
+    return players;
   }
 
   function randomCoord() {
@@ -103,6 +68,28 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     rancoordinates.push(cCoord, rCoord);
 
     return rancoordinates;
+  }
+
+  function shipRandomizer(playerObj) {
+    let shipArr = [...playerObj.ships];
+
+    shipArr.forEach((shipLength) => {
+      let placed = false;
+      while (!placed) {
+        // random direction of ship placement
+        const rancoordinates = randomCoord();
+        const random = Math.floor(Math.random() * 2);
+        const axis = random === 0 ? "h" : "v";
+
+        // returns false if was not able to place ship at random spot, trys again
+        placed = shipMakerProxy(
+          playerObj.number,
+          shipLength,
+          rancoordinates,
+          axis,
+        );
+      }
+    });
   }
 
   function shipScreen(playerObj) {
@@ -179,7 +166,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     frigCountBox.textContent = `x ${frigCount}`;
     schoonCountBox.textContent = `x ${schoonCount}`;
     sloopCountBox.textContent = `x ${sloopCount}`;
-
     // build the visual grid
     for (let i = 0; i < gridSize; i++) {
       const row = document.createElement("div");
@@ -194,7 +180,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         row.appendChild(cell);
       }
     }
-
     // cycle ship placement orientation, initialized to "h"
     const orientationBtn = document.querySelector(".orientationBtn");
     orientationBtn.addEventListener("click", (e) => {
@@ -260,8 +245,11 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       });
     };
 
-    const cells = document.querySelectorAll(".cell");
+    function leaveScreen() {
+      return;
+    }
 
+    const cells = document.querySelectorAll(".cell");
     // translates UI cell to a coordinate on a dragover event
     // checks if the ship dragged will fit
     cells.forEach((cell) => {
@@ -347,25 +335,21 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
                 remainingShips = mowCount;
                 mowCount -= 1;
                 manCountBox.textContent = `x ${mowCount}`;
-
                 break;
               case 4:
                 remainingShips = frigCount;
                 frigCount -= 1;
                 frigCountBox.textContent = `x ${frigCount}`;
-
                 break;
               case 3:
                 remainingShips = schoonCount;
                 schoonCount -= 1;
                 schoonCountBox.textContent = `x ${schoonCount}`;
-
                 break;
               case 2:
                 remainingShips = sloopCount;
                 sloopCount -= 1;
                 sloopCountBox.textContent = `x ${sloopCount}`;
-
                 break;
               default:
                 console.error("error: invalid ship length in dragShip");
@@ -381,84 +365,103 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         }
         dragShip = undefined;
         dragShipLength = undefined;
+        if (
+          mowCount <= 0 &&
+          frigCount <= 0 &&
+          schoonCount <= 0 &&
+          sloopCount <= 0
+        ) {
+          const nextBtn = document.createElement("button");
+          nextBtn.textContent = "Next";
+          pageContainer.appendChild(nextBtn);
+
+          nextBtn.addEventListener("click", () => {
+            leaveScreen();
+            console.log("there should be some leaving happening right now");
+          });
+        }
       });
     });
-
-    // create method for checking the coordinate space on a hover event
-    // create method for adding the ship to the location on the click event.
   }
+  function startScreen(gameScriptFn) {
+    const htmlContent = `
+      <div class="title">Battleship</div>
+              <div class="playerSelectCont">
+                 <form action="" class="playerForm">
+                      <div class="pSelect p1">
+                          <div class="countryName p1"></div>
+                          <div class="pTxt p1">Player 1</div>
+                          <div class="selectDropdown p1">
+                              <select id="selectp1" name="select">
+                                  <option value="person" selected>Player</option>
+                                  <option value="cpu">CPU</option>
+                              </select>
+                          </div>
+                          <div class="countrySelectCont p1">
+                              <div class="countryBox p1" id="Germany">DE</div>
+                              <div class="countryBox p1" id="Denmark">DK</div>
+                              <div class="countryBox p1" id="UK">UK</div>
+                              <div class="countryBox p1" id="Portugal">PT</div>
+                              <div class="countryBox p1" id="Spain">PT</div>
+                              <div class="countryBox p1" id="Italy">PT</div>
+                              <div class="countryBox p1" id="French">PT</div>
+                              <div class="countryBox p1" id="Dutch">PT</div>
+                          </div>
+                      </div>
+                      <div class="pSelect p2">
+                          <div class="countryName p2"></div>
+                          <div class="pTxt p2">Player 1</div>
+                          <div class="selectDropdown p2">
+                              <select id="selectp2" name="select">
+                                  <option value="person" selected>Player</option>
+                                  <option value="cpu">CPU</option>
+                              </select>
+                          </div>
+                          <div class="countrySelectCont p2">
+                              <div class="countryBox p2" id="Germany">DE</div>
+                              <div class="countryBox p2" id="Denmark">DK</div>
+                              <div class="countryBox p2" id="UK">UK</div>
+                              <div class="countryBox p2" id="Portugal">PT</div>
+                              <div class="countryBox p2" id="Spain">PT</div>
+                              <div class="countryBox p2" id="Italy">PT</div>
+                              <div class="countryBox p2" id="French">PT</div>
+                              <div class="countryBox p2" id="Dutch">PT</div>
+                          </div>
+                      </div>
+                      <div class="btnCont">
+                          <button type="submit">Begin</button>
+                      </div>
+                 </form>
 
-  function shipRandomizer(playerObj) {
-    let shipArr = [...playerObj.ships];
+              </div>
+              <div class="footer">
+              </div>
+      `;
+    pageContainer.innerHTML = htmlContent;
+    const playerForm = document.querySelector(".playerForm");
+    initCountrySelect();
+    playerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const players = pObjInitializer(
+        gameScriptFn,
+        ".playerForm",
+        "selectp1",
+        "selectp2",
+      );
 
-    shipArr.forEach((shipLength) => {
-      let placed = false;
-      while (!placed) {
-        // random direction of ship placement
-        const rancoordinates = randomCoord();
-        const random = Math.floor(Math.random() * 2);
-        const axis = random === 0 ? "h" : "v";
-
-        // shipMakerProxy returns false if was not able to place ship at random spot, trys again
-        placed = shipMakerProxy(
-          playerObj.number,
-          shipLength,
-          rancoordinates,
-          axis,
-        );
-      }
+      players.forEach((element) => {
+        if (element.player === "person") {
+          playerInitScript(element);
+          shipScreen(element);
+        } else {
+          playerInitScript(element);
+          shipRandomizer(element);
+        }
+      });
+      // trigger the next screen
     });
   }
-
-  // builds a playerobj that contains information to initialize the game
-  function pObjInitializer(gameScriptFn, formClssNme, p1selectid, p2selectid) {
-    // build the obj and export to
-    const playerForm = document.querySelector(formClssNme);
-    const dropdownfield1 = document.getElementById(p1selectid);
-    const dropdownfield2 = document.getElementById(p2selectid);
-    let players = [];
-
-    const manowar = 5;
-    const frigate = 4;
-    const schooner = 3;
-    const sloop = 2;
-
-    const playerobj = {
-      player: undefined,
-      number: undefined,
-      country: undefined,
-      ships: [
-        manowar,
-        frigate,
-        frigate,
-        schooner,
-        schooner,
-        schooner,
-        sloop,
-        sloop,
-      ],
-    };
-
-    const player1 = { ...playerobj };
-    const player2 = { ...playerobj };
-
-    player1.player = dropdownfield1.value;
-    player1.number = 1;
-    player1.country = p1Country;
-
-    player2.player = dropdownfield2.value;
-    player2.number = 2;
-    player2.country = p2Country;
-
-    players.push(player1, player2);
-
-    return players;
-  }
-
-  function UItoCoord() {}
-  function sendMove() {}
-  startScreen();
-  return { pObjInitializer, sendMove };
+  return { startScreen, pObjInitializer };
 };
 
 module.exports = userInterface;

@@ -80,27 +80,28 @@ const gameModule = () => {
   }
 
   const ui = uiScript(shipPlacerProxy, playerInitializer, gameInitializer);
+  ui.startScreen();
   let player1 = undefined;
   let player2 = undefined;
   const cpuAI = cpu();
-  const sloopP1 = ship(2);
-  const frigateP1 = ship(4);
-  const sloopP2 = ship(2);
-  const frigateP2 = ship(4);
+  //  const sloopP1 = ship(2);
+  //  const frigateP1 = ship(4);
+  //  const sloopP2 = ship(2);
+  //  const frigateP2 = ship(4);
   let gameOver = false;
-  const p1 = player("Dk", gameBoard());
-  let p2 = cpuPlayerWrapper(
-    player("UK", gameBoard(), true),
-    cpuAI,
-    p1.playerBoard,
-  );
-  let currentPlayer = p1;
-  p1.playerBoard.addShip(sloopP1, [2, 4], "h");
-  p1.playerBoard.addShip(sloopP1, [6, 4], "h");
-  p1.playerBoard.addShip(frigateP1, [3, 2], "v");
-  p2.playerBoard.addShip(sloopP2, [2, 4], "h");
-  p2.playerBoard.addShip(sloopP2, [8, 4], "h");
-  p2.playerBoard.addShip(frigateP2, [1, 2], "v");
+  //  const p1 = player("Dk", gameBoard());
+  //  let p2 = cpuPlayerWrapper(
+  //    player("UK", gameBoard(), true),
+  //    cpuAI,
+  //    p1.playerBoard,
+  //  );
+  // let currentPlayer = p1;
+  //  p1.playerBoard.addShip(sloopP1, [2, 4], "h");
+  //  p1.playerBoard.addShip(sloopP1, [6, 4], "h");
+  //  p1.playerBoard.addShip(frigateP1, [3, 2], "v");
+  //  p2.playerBoard.addShip(sloopP2, [2, 4], "h");
+  //  p2.playerBoard.addShip(sloopP2, [8, 4], "h");
+  //  p2.playerBoard.addShip(frigateP2, [1, 2], "v");
 
   function endGame(winner) {
     // some shit here to end the game
