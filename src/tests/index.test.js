@@ -2,7 +2,7 @@ const gameModule = require("../index.js");
 // once the game initialization code is made, this will need to be refactored to make custom initializer.
 const game = gameModule();
 
-test("gameLoop correctly handles input from mock UI & CPU player", () => {
+test("gameTurn correctly handles input from mock UI & CPU player", () => {
   const mockUIinputTest = () => {
     const mockPlayerGuesses = [
       [1, 2],
@@ -15,10 +15,10 @@ test("gameLoop correctly handles input from mock UI & CPU player", () => {
       [2, 5],
     ];
     while (!game.isGameOver()) {
-      // pulls first guess and sends it gameloop as its strike guess
+      // pulls first guess and sends it gameturn as its strike guess
       // because gameModule uses recursion to trigger cpu turn
       // it is not necessary to call a cpu turn
-      game.gameLoop(mockPlayerGuesses.shift());
+      game.gameTurn(mockPlayerGuesses.shift());
     }
     if (game.isGameOver()) {
       return "game succesfully ended";

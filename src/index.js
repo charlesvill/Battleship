@@ -7,7 +7,7 @@ const uiScript = require("./ui");
 
 const gameModule = () => {
   // temporary initializers that will be wrapped in a function that will assign game elements
-  // the game initializer will use this function to build the player element for cpu
+  // the game initializer will use this function for connecting cpu AI to other functions
   const cpuPlayerWrapper = (playerClass, cpuAI, enemyBoard) => {
     playerClass.isCPU = true;
     function attack() {
@@ -74,20 +74,28 @@ const gameModule = () => {
     return true;
   }
 
+  function gameLoop() {
+    // while game is not over
+    // call ui strikescreen for current player if its a person
+  }
+
   function gameInitializer() {
-    // this will add the ships to the board;
     // after adding the ships , it will need to check who is cpu and initialize the cpuwrapper
+    // may need a loop fn as driver for the ui strikescreens
+    // ui strikes will be handled by this driver fn for the turn taking and
+    // cpu turns will be handled by gameloop automatically
+    // only really need to handle the person turn and sending that persons
+    // coordinates to gameloop
+    // should rename gameloop to "taking turn" or something bc its not
+    // actually looping. and it probably should not loop.
   }
 
   const ui = uiScript(shipPlacerProxy, playerInitializer, gameInitializer);
+
+  // this initializes but the game loop picks back up when ui script calls gameinitializer;
   ui.startScreen();
-  let player1 = undefined;
-  let player2 = undefined;
   const cpuAI = cpu();
-  //  const sloopP1 = ship(2);
-  //  const frigateP1 = ship(4);
-  //  const sloopP2 = ship(2);
-  //  const frigateP2 = ship(4);
+
   let gameOver = false;
   //  const p1 = player("Dk", gameBoard());
   //  let p2 = cpuPlayerWrapper(
@@ -96,25 +104,20 @@ const gameModule = () => {
   //    p1.playerBoard,
   //  );
   // let currentPlayer = p1;
-  //  p1.playerBoard.addShip(sloopP1, [2, 4], "h");
-  //  p1.playerBoard.addShip(sloopP1, [6, 4], "h");
-  //  p1.playerBoard.addShip(frigateP1, [3, 2], "v");
-  //  p2.playerBoard.addShip(sloopP2, [2, 4], "h");
-  //  p2.playerBoard.addShip(sloopP2, [8, 4], "h");
-  //  p2.playerBoard.addShip(frigateP2, [1, 2], "v");
 
   function endGame(winner) {
     // some shit here to end the game
     console.log("this mf over lol");
   }
-  // gameLoop is called by event handler on UI interaction -or- by recursion when its cpu turn
-  function gameLoop(coordinates = "") {
+  // gameTurn is called by event handler on UI interaction -or- by recursion when its cpu turn
+  function gameTurn(coordinates = "") {
     if (gameOver) {
       return endGame();
     }
 
     if (currentPlayer === p1) {
       const strike = p1.attack(coordinates, p2.playerBoard);
+      // return value anything other than num = player loses
       if (isNaN(p2.playerBoard.shipsRemaining())) {
         gameOver = true;
         return endGame(p1);
@@ -122,20 +125,21 @@ const gameModule = () => {
       currentPlayer = p2;
     } else if (currentPlayer === p2) {
       const strike = p2.attack(coordinates, p1.playerBoard);
-      if (p1.playerBoard.shipsRemaining() === 0) {
+      // check this line for errors, this was refactored differently
+      if (isNaN(p1.playerBoard.shipsRemaining())) {
         gameOver = true;
         return endGame(p1);
       }
       currentPlayer = p1;
     }
     if (currentPlayer.isCPU === true) {
-      return gameLoop();
+      return gameTurn();
     }
   }
   function isGameOver() {
     return gameOver;
   }
-  return { gameLoop, isGameOver };
+  return { gameTurn, isGameOver };
 };
 gameModule();
 module.exports = gameModule;

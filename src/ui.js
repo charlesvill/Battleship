@@ -17,7 +17,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
   }
 
   // builds a playerobj that contains information to initialize the game
-  function pObjInitializer(gameScriptFn, formClssNme, p1selectid, p2selectid) {
+  function pObjInitializer(formClssNme, p1selectid, p2selectid) {
     const playerForm = document.querySelector(formClssNme);
     const dropdownfield1 = document.getElementById(p1selectid);
     const dropdownfield2 = document.getElementById(p2selectid);
@@ -28,6 +28,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     const schooner = 3;
     const sloop = 2;
 
+    // player is either "cpu" or "person"
     const playerobj = {
       player: undefined,
       number: undefined,
@@ -160,11 +161,13 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
 
       let ships = document.querySelectorAll(".ship");
       let shipContainer = document.querySelector(".shipBox");
+      let playerName = document.querySelector(".playerName");
       let manCountBox = document.querySelector(".shipCount.man");
       let frigCountBox = document.querySelector(".shipCount.frig");
       let schoonCountBox = document.querySelector(".shipCount.schoon");
       let sloopCountBox = document.querySelector(".shipCount.sloop");
 
+      playerName.textContent = `Player ${playerObj.number}`;
       manCountBox.textContent = `x ${mowCount}`;
       frigCountBox.textContent = `x ${frigCount}`;
       schoonCountBox.textContent = `x ${schoonCount}`;
@@ -267,7 +270,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           const r = Number(e.currentTarget.dataset.r);
           const c = Number(e.currentTarget.dataset.c);
           coord = [r, c];
-          console.log(`coord before proxy: ${coord}`);
           dragFits = shipMakerProxy(
             playerObj.number,
             dragShipLength,
@@ -318,7 +320,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           ship.classList.remove("dragging");
 
           if (dragFits) {
-            console.log(`coord before placing is : ${coord}`);
             const placed = shipMakerProxy(
               playerObj.number,
               dragShipLength,
@@ -327,7 +328,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               false,
             );
 
-            console.log(`coord after placing is : ${coord}`);
             if (placed) {
               gridShader(coord, dragShipLength, orientation, dragFits, true);
 
@@ -389,7 +389,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       });
     });
   }
-  async function startScreen(gameScriptFn) {
+  async function startScreen() {
     const htmlContent = `
       <div class="title">Battleship</div>
               <div class="playerSelectCont">
@@ -446,19 +446,14 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     pageContainer.innerHTML = htmlContent;
     const playerForm = document.querySelector(".playerForm");
     initCountrySelect();
-    playerForm.addEventListener("submit", (e) => {
+    playerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const players = pObjInitializer(
-        gameScriptFn,
-        ".playerForm",
-        "selectp1",
-        "selectp2",
-      );
+      const players = pObjInitializer(".playerForm", "selectp1", "selectp2");
+      // playerobj sent back to extend functionality with player script
       async function processPlayers(players) {
         for (const element of players) {
           if (element.player === "person") {
             playerInitScript(element);
-            console.log("player screen being opened");
             await shipScreen(element);
           } else {
             playerInitScript(element);
@@ -466,7 +461,12 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           }
         }
       }
-      processPlayers(players);
+      await processPlayers(players);
+      // index global variables should be populated with both players
+      // call to continue game should have index accessing global player
+      // objs and should work fine. but it is kinda sloppy
+      // this passes over control back to the index script.
+      gameInitScript();
     });
   }
   return { startScreen, pObjInitializer };
