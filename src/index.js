@@ -10,7 +10,6 @@ const gameModule = () => {
   // the game initializer will use this function for connecting cpu AI to other functions
   const cpuPlayerWrapper = (playerClass, cpuAI, enemyBoard) => {
     // this wrapper will need to be refactored after changes to player class
-    playerClass.isCPU = true;
     function attack() {
       let nextStrike = cpuAI.nextMove();
       while (playerClass.canStrike(nextStrike, enemyBoard) === false) {
@@ -27,13 +26,12 @@ const gameModule = () => {
       }
     }
     return {
+      ...playerClass.playerObj,
       attack,
-      isCPU: playerClass.isCPU,
       playerBoard: playerClass.playerBoard,
+      isCPU: playerClass.isCPU,
     };
   };
-
-  //
 
   function playerInitializer(playerObj) {
     if (playerObj.number === 1) {
@@ -77,14 +75,38 @@ const gameModule = () => {
     return true;
   }
 
-  function gameLoop() {
+  async function gameLoop() {
     // while game is not over
+    console.log("greetings from gameloop");
+    console.dir(currentPlayer);
     // call ui strikescreen for current player if its a person
+    while (gameOver === false) {
+      if (!currentPlayer.isCpu) {
+        const coord = await ui.strikeScreen(currentPlayer.number);
+        gameTurn(coord);
+      } else {
+        gameTurn();
+      }
+    }
+    // call ui fn that will end the game
+    // ui should allow them to reset the game.
+    // call index fn that will the game
   }
 
   function gameInitializer() {
     // after adding the ships , it will need to check who is cpu and initialize the cpuwrapper
-    // reassigning the player variable with cpu cpuPlayerWrapper
+
+    if (player1.isCPU) {
+      const copy = { ...player1 };
+      player1 = cpuPlayerWrapper(copy, cpuAI, player2.playerBoard);
+    }
+    if (player2.isCPU) {
+      const copy = { ...player2 };
+      player2 = cpuPlayerWrapper(copy, cpuAI, player2.playerBoard);
+    }
+
+    gameLoop();
+
     // will initialize the game loop fn that will call ui for strike screens
     // cpu turns will be handled by gameloop automatically
   }
@@ -92,17 +114,19 @@ const gameModule = () => {
   const ui = uiScript(shipPlacerProxy, playerInitializer, gameInitializer);
 
   // this initializes but the game loop picks back up when ui script calls gameinitializer;
-  ui.startScreen();
+  let player1 = undefined;
+  let player2 = undefined;
+  let currentPlayer = player1;
   const cpuAI = cpu();
-
   let gameOver = false;
-  //  const p1 = player("Dk", gameBoard());
-  //  let p2 = cpuPlayerWrapper(
+  ui.startScreen();
+
+  //  const player1 = player("Dk", gameBoard());
+  //  let player2 = cpuPlayerWrapper(
   //    player("UK", gameBoard(), true),
   //    cpuAI,
-  //    p1.playerBoard,
+  //    player1.playerBoard,
   //  );
-  // let currentPlayer = p1;
 
   function endGame(winner) {
     // some shit here to end the game
@@ -114,22 +138,22 @@ const gameModule = () => {
       return endGame();
     }
 
-    if (currentPlayer === p1) {
-      const strike = p1.attack(coordinates, p2.playerBoard);
+    if (currentPlayer === player1) {
+      const strike = player1.attack(coordinates, player2.playerBoard);
       // return value anything other than num = player loses
-      if (isNaN(p2.playerBoard.shipsRemaining())) {
+      if (isNaN(player2.playerBoard.shipsRemaining())) {
         gameOver = true;
-        return endGame(p1);
+        return endGame(player1);
       }
-      currentPlayer = p2;
-    } else if (currentPlayer === p2) {
-      const strike = p2.attack(coordinates, p1.playerBoard);
+      currentPlayer = player2;
+    } else if (currentPlayer === player2) {
+      const strike = player2.attack(coordinates, player1.playerBoard);
       // check this line for errors, this was refactored differently
-      if (isNaN(p1.playerBoard.shipsRemaining())) {
+      if (isNaN(player1.playerBoard.shipsRemaining())) {
         gameOver = true;
-        return endGame(p1);
+        return endGame(player1);
       }
-      currentPlayer = p1;
+      currentPlayer = player1;
     }
     if (currentPlayer.isCPU === true) {
       return gameTurn();

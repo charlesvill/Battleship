@@ -3,6 +3,7 @@ const gameModule = require("../index.js");
 const game = gameModule();
 
 test("gameTurn correctly handles input from mock UI & CPU player", () => {
+  // this will need to be refactored for this assumes that p1 is a player.
   const mockUIinputTest = () => {
     const mockPlayerGuesses = [
       [1, 2],

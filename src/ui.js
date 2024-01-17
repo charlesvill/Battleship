@@ -138,16 +138,20 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               <div class="txt">
                   Place your ships!
               </div>
+              <button class="randomBtn">
+                  Randomize
+              </button>
           </div>
       </div>
      `;
       pageContainer.innerHTML = "";
       pageContainer.innerHTML = htmlContent;
+      console.log("dom finished loading");
 
       // necessary globals for methods in ship select
       const gridContainer = document.querySelector(".gridCont");
       const gridSize = 10;
-      let dragShipLength = 0;
+      let aragShipLength = 0;
       let dragShip = undefined;
       let dragFits = false;
       let orientation = "h";
@@ -198,6 +202,38 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           orientation = "h";
           orientationBtn.textContent = "Horizontal";
         }
+      });
+
+      function shipDragHandler(e) {
+        dragShipLength = Number(e.currentTarget.dataset.index);
+
+        const clone = ship.cloneNode(true);
+        dragShip = ship;
+        // Set the offset for the drag image
+        const offsetX = 20; // Set your desired offset value
+        e.dataTransfer.setDragImage(clone, 0, 0);
+        ship.classList.add("dragging");
+      }
+      function randomBtnFn() {
+        // left off here. currently it is not prompting the next button to appear
+        // it is also not updating the visual...
+        // perhaps should also check the gameboards to make sure that something was populated
+        resolve();
+
+        ships.forEach((ship) => {
+          ship.removeEventListener("dragstart", shipDragHandler);
+        });
+        dragShip = undefined;
+        dragShipLength = undefined;
+        mowCount <= 0 && frigCount <= 0 && schoonCount <= 0 && sloopCount <= 0;
+        console.log("greetings from the randomizer btn");
+      }
+
+      const randomBtn = document.querySelector(".randomBtn");
+
+      console.log(randomBtn);
+      randomBtn.addEventListener("click", () => {
+        randomBtnFn();
       });
 
       const gridShader = (
@@ -303,17 +339,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       shipIMG.style.width = "1rem";
 
       ships.forEach((ship) => {
-        const shipDragHandler = (e) => {
-          dragShipLength = Number(e.currentTarget.dataset.index);
-
-          const clone = ship.cloneNode(true);
-          dragShip = ship;
-          // Set the offset for the drag image
-          const offsetX = 20; // Set your desired offset value
-          e.dataTransfer.setDragImage(clone, 0, 0);
-          ship.classList.add("dragging");
-        };
-
         ship.addEventListener("dragstart", shipDragHandler);
 
         ship.addEventListener("dragend", () => {
@@ -388,6 +413,11 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         });
       });
     });
+  }
+  async function strikeScreen(playerNumber) {
+    console.log(
+      `this is being called from strike screen for player ${playerNumber}`,
+    );
   }
   async function startScreen() {
     const htmlContent = `
@@ -469,7 +499,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       gameInitScript();
     });
   }
-  return { startScreen, pObjInitializer };
+  return { startScreen, pObjInitializer, strikeScreen };
 };
 
 module.exports = userInterface;
