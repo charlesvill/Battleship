@@ -9,6 +9,7 @@ const gameModule = () => {
   // temporary initializers that will be wrapped in a function that will assign game elements
   // the game initializer will use this function for connecting cpu AI to other functions
   const cpuPlayerWrapper = (playerClass, cpuAI, enemyBoard) => {
+    // this wrapper will need to be refactored after changes to player class
     playerClass.isCPU = true;
     function attack() {
       let nextStrike = cpuAI.nextMove();
@@ -32,13 +33,15 @@ const gameModule = () => {
     };
   };
 
-  function playerInitializer(playerObj) {
-    const isCPU = playerObj.player === "person" ? false : true;
+  //
 
+  function playerInitializer(playerObj) {
     if (playerObj.number === 1) {
-      player1 = player(playerObj.country, gameBoard(), isCPU);
+      player1 = player(playerObj, gameBoard());
+      console.dir(player1);
     } else {
-      player2 = player(playerObj.country, gameBoard(), isCPU);
+      player2 = player(playerObj, gameBoard());
+      console.dir(player2);
     }
   }
 
@@ -81,13 +84,9 @@ const gameModule = () => {
 
   function gameInitializer() {
     // after adding the ships , it will need to check who is cpu and initialize the cpuwrapper
-    // may need a loop fn as driver for the ui strikescreens
-    // ui strikes will be handled by this driver fn for the turn taking and
+    // reassigning the player variable with cpu cpuPlayerWrapper
+    // will initialize the game loop fn that will call ui for strike screens
     // cpu turns will be handled by gameloop automatically
-    // only really need to handle the person turn and sending that persons
-    // coordinates to gameloop
-    // should rename gameloop to "taking turn" or something bc its not
-    // actually looping. and it probably should not loop.
   }
 
   const ui = uiScript(shipPlacerProxy, playerInitializer, gameInitializer);

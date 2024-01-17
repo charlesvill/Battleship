@@ -1,7 +1,8 @@
 // this will demonstrate dependency injection with the needed methods for the player board and enemy board ref
 
-const player = (nationality, boardFn, isCPU = "false") => {
+const player = (playerObj, boardFn) => {
   const playerBoard = boardFn;
+  const isCPU = playerObj.player === "person" ? false : true;
 
   function canStrike(coordinates, enemyBoard) {
     return enemyBoard.canStrike(coordinates);
@@ -15,7 +16,7 @@ const player = (nationality, boardFn, isCPU = "false") => {
     return "try another attack";
   }
 
-  return { nationality, playerBoard, canStrike, attack, isCPU };
+  return { ...playerObj, playerBoard, canStrike, attack, isCPU };
 };
 
 module.exports = player;
