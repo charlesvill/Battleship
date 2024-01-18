@@ -1,3 +1,5 @@
+const player = require("./player");
+
 const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
   const pageContainer = document.querySelector(".pageContainer");
   let p1Country = "";
@@ -91,6 +93,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         );
       }
     });
+    console.dir(playerObj);
   }
 
   async function shipScreen(playerObj) {
@@ -215,18 +218,9 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         ship.classList.add("dragging");
       }
       function randomBtnFn() {
-        // left off here. currently it is not prompting the next button to appear
-        // it is also not updating the visual...
-        // perhaps should also check the gameboards to make sure that something was populated
+        console.log(playerObj);
+        shipRandomizer(playerObj);
         resolve();
-
-        ships.forEach((ship) => {
-          ship.removeEventListener("dragstart", shipDragHandler);
-        });
-        dragShip = undefined;
-        dragShipLength = undefined;
-        mowCount <= 0 && frigCount <= 0 && schoonCount <= 0 && sloopCount <= 0;
-        console.log("greetings from the randomizer btn");
       }
 
       const randomBtn = document.querySelector(".randomBtn");

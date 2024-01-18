@@ -83,6 +83,7 @@ const gameModule = () => {
     while (gameOver === false) {
       if (!currentPlayer.isCpu) {
         const coord = await ui.strikeScreen(currentPlayer.number);
+        console.log(`coordinates to strike are: ${coord}`);
         gameTurn(coord);
       } else {
         gameTurn();
@@ -105,6 +106,8 @@ const gameModule = () => {
       player2 = cpuPlayerWrapper(copy, cpuAI, player2.playerBoard);
     }
 
+    currentPlayer = player1;
+    console.log(currentPlayer);
     gameLoop();
 
     // will initialize the game loop fn that will call ui for strike screens
@@ -116,7 +119,7 @@ const gameModule = () => {
   // this initializes but the game loop picks back up when ui script calls gameinitializer;
   let player1 = undefined;
   let player2 = undefined;
-  let currentPlayer = player1;
+  let currentPlayer = undefined;
   const cpuAI = cpu();
   let gameOver = false;
   ui.startScreen();
