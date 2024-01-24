@@ -25,6 +25,8 @@ const gameModule = () => {
         return strikeResult;
       }
     }
+    // there could be a problem with returning the whole class because of the attack fn being on the same level
+    // as cpu player wrapper. come back to this, maybe do not spread the whole class but pieces of it.
     return {
       ...playerClass.playerObj,
       attack,
@@ -75,6 +77,24 @@ const gameModule = () => {
     return true;
   }
 
+  // gameTurn is called by event handler on UI interaction -or- by recursion when its cpu turn
+  function gameTurn(coordinates = "", playerClass, enemyClass) {
+    if (gameOver) {
+      return endGame();
+    }
+
+    // return value anything other than num = player loses
+    if (isNaN(enemyClass.playerBoard.shipsRemaining())) {
+      gameOver = true;
+      // return endGame(player1); this needs to be refactored
+    }
+    // how the cpu player is handled will need to be refactored as well.
+    if (currentPlayer.isCPU === true) {
+      return gameTurn();
+    }
+    return playerClass.attack(coordinates, enemyClass.playerBoard);
+  }
+
   async function gameLoop() {
     // while game is not over
     console.log("greetings from gameloop");
@@ -82,11 +102,24 @@ const gameModule = () => {
     // call ui strikescreen for current player if its a person
     while (gameOver === false) {
       if (!currentPlayer.isCpu) {
-        const coord = await ui.strikeScreen(currentPlayer.number);
-        console.log(`coordinates to strike are: ${coord}`);
-        gameTurn(coord);
+        const enemyClass = currentPlayer === player1 ? player2 : player1;
+        // strikeScreen will call take turn and await the results
+        // of that strike. then will return to this once its done
+        await ui.strikeScreen(currentPlayer, enemyClass, gameTurn);
+        console.log("this should not be printing yet");
       } else {
+        // there is a chance could use strike screen for CPU for the purposes of
+        // showing the strike that cpu will place;
+        // would need to give the strikescreen the cpu wrapper so it can trigger
+        // the cpu fns from strike screen
+
         gameTurn();
+      }
+
+      if (currentPlayer === player1) {
+        currentPlayer = player2;
+      } else if (currentPlayer === player2) {
+        currentPlayer = player1;
       }
     }
     // call ui fn that will end the game
@@ -103,7 +136,7 @@ const gameModule = () => {
     }
     if (player2.isCPU) {
       const copy = { ...player2 };
-      player2 = cpuPlayerWrapper(copy, cpuAI, player2.playerBoard);
+      player2 = cpuPlayerWrapper(copy, cpuAI, player1.playerBoard);
     }
 
     currentPlayer = player1;
@@ -135,36 +168,11 @@ const gameModule = () => {
     // some shit here to end the game
     console.log("this mf over lol");
   }
-  // gameTurn is called by event handler on UI interaction -or- by recursion when its cpu turn
-  function gameTurn(coordinates = "") {
-    if (gameOver) {
-      return endGame();
-    }
 
-    if (currentPlayer === player1) {
-      const strike = player1.attack(coordinates, player2.playerBoard);
-      // return value anything other than num = player loses
-      if (isNaN(player2.playerBoard.shipsRemaining())) {
-        gameOver = true;
-        return endGame(player1);
-      }
-      currentPlayer = player2;
-    } else if (currentPlayer === player2) {
-      const strike = player2.attack(coordinates, player1.playerBoard);
-      // check this line for errors, this was refactored differently
-      if (isNaN(player1.playerBoard.shipsRemaining())) {
-        gameOver = true;
-        return endGame(player1);
-      }
-      currentPlayer = player1;
-    }
-    if (currentPlayer.isCPU === true) {
-      return gameTurn();
-    }
-  }
   function isGameOver() {
     return gameOver;
   }
+
   return { gameTurn, isGameOver };
 };
 gameModule();
