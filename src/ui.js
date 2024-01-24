@@ -408,10 +408,101 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       });
     });
   }
-  async function strikeScreen(playerNumber) {
-    console.log(
-      `this is being called from strike screen for player ${playerNumber}`,
-    );
+  // possibly for cpu, still call SS but do not wipe html and just show the effect of hitting one of the other player ships.
+  // gameTurn requires coordinates, playerClass, enemyClass
+  async function strikeScreen(playerClass, enemyClass, gameTurnScript) {
+    return new Promise((resolve) => {
+      const htmlContent = ` <div class="header">
+          <div class="playerName"></div>
+       </div>
+       <div class="strikeCont">
+           <div class="strikeGridCont">
+               <span>Strike Result</span>
+           </div>
+           <div class="shipPlacedCont">
+               <div class="shipPlacedGrid"></div>
+               <div class="shipsRemainCont"></div>
+           </div>
+       </div>
+       <div class="footer">
+       </div>
+      `;
+      pageContainer.innerHTML = "";
+      pageContainer.innerHTML = htmlContent;
+
+      const gridSize = 10;
+      const gridContainer = document.querySelector(".strikeGridCont");
+      let ableToStrike = undefined;
+      const hitSVG = document.createElement("div");
+      hitSVG.innerHTML = `<svg class="hitIcon" xmlns ="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+          <path xmlns="http://www.w3.org/2000/svg" d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+        </svg>`;
+      const missSvg = document.createElement("div");
+      missSvg.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-480Zm0 280q-116 0-198-82t-82-198q0-116 82-198t198-82q116 0 198 82t82 198q0 116-82 198t-198 82Zm0-80q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680q-83 0-141.5 58.5T280-480q0 83 58.5 141.5T480-280Z"/></svg>`;
+
+      // build the strike grid
+      for (let i = 0; i < gridSize; i++) {
+        const row = document.createElement("div");
+        row.classList.add("rowCont");
+        gridContainer.appendChild(row);
+
+        for (let j = 0; j < gridSize; j++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          cell.dataset.r = i;
+          cell.dataset.c = j;
+          row.appendChild(cell);
+        }
+      }
+      // placed ships grid should be a fn declared above and called here
+      // no event listeners but will show missed shots and sunk ships
+
+      const cells = document.querySelectorAll(".cell");
+      // translates UI cell to a coordinate
+      // checks if there was already a hit in the grid square
+
+      cells.forEach((cell) => {
+        cell.addEventListener("click", (e) => {
+          e.preventDefault();
+          // if struck already
+          if (undefined) {
+            return;
+          }
+          const r = Number(e.currentTarget.dataset.r);
+          const c = Number(e.currentTarget.dataset.c);
+          coord = [r, c];
+          // replace this fn with checker for repeat strikes
+          console.log(coord);
+          // this might break if player canstrike is refactored
+          const canStrike = playerClass.canStrike(
+            coord,
+            enemyClass.playerBoard,
+          );
+          if (canStrike) {
+            // send signal to strike to gameTurn
+            const response = gameTurnScript(coord, playerClass, enemyClass);
+            console.log(response);
+            if (response !== "miss") {
+              cell.classList.add("hit");
+              const cloneSVG = hitSVG.cloneNode(true);
+              cell.appendChild(cloneSVG);
+              // show the visual hit on the cell
+            } else {
+              cell.classList.add("miss");
+              const cloneSVG = missSvg.cloneNode(true);
+              cell.appendChild(cloneSVG);
+              // show the visual miss on the cell
+            }
+          } else {
+            // add classname for not able to strike
+          }
+        });
+      });
+
+      console.log(
+        `this is being called from strike screen for player ${playerClass.number}`,
+      );
+    });
   }
   async function startScreen() {
     const htmlContent = `

@@ -61,3 +61,9 @@
 .depleted {
   background-color: grey;
 }
+.hitIcon{
+  fill: red;
+}
+.hitIcon path {
+  stroke-width: 4;
+}
