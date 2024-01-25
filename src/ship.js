@@ -6,6 +6,8 @@
 const ship = (length) => {
   let type = "";
   let damage = 0;
+  let coordinates = [];
+  let orientation = "";
 
   switch (length) {
     case 2:
@@ -34,7 +36,16 @@ const ship = (length) => {
   function hitpoints() {
     return length - damage;
   }
-  return { type, length, damage, hitpoints, hit, isSunk };
+  return {
+    type,
+    length,
+    coordinates,
+    orientation,
+    damage,
+    hitpoints,
+    hit,
+    isSunk,
+  };
 };
 
 module.exports = ship;

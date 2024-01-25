@@ -95,9 +95,77 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     });
     console.dir(playerObj);
   }
+  function gridBuilder(gridContainer, gridSize) {
+    for (let i = 0; i < gridSize; i++) {
+      const row = document.createElement("div");
+      row.classList.add("rowCont");
+      gridContainer.appendChild(row);
+
+      for (let j = 0; j < gridSize; j++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.r = i;
+        cell.dataset.c = j;
+        row.appendChild(cell);
+      }
+    }
+  }
+  function gridShader(
+    coord,
+    length,
+    orientation,
+    dragFits,
+    placed = false,
+    gridContainer,
+  ) {
+    const offsetr = orientation === "h" ? 0 : 1;
+    const offsetc = orientation === "h" ? 1 : 0;
+    let addedClass = "";
+    const gridContainerName = gridContainer.classList.value;
+    console.log(gridContainerName);
+
+    // 3 shading possiblities fits/nofits/placed
+    if (placed === true) {
+      addedClass = "placed";
+    } else {
+      addedClass = dragFits === true ? "fits" : "notFits";
+    }
+
+    const currentCoord = [...coord];
+    let cellCollection = [];
+
+    // shade each cell representing ship length
+    for (let i = 0; i < length; i++) {
+      const currentCell = document.querySelector(
+        `.${gridContainerName} [data-r="${currentCoord[0]}"][data-c="${currentCoord[1]}"]`,
+      );
+      cellCollection.push(currentCell);
+
+      if (currentCell !== null) {
+        currentCell.classList.add(`${addedClass}`);
+      } else {
+        continue;
+      }
+      currentCoord[0] += offsetr;
+      currentCoord[1] += offsetc;
+    }
+    // after shade, dragleave handler to clear shading when not placed
+    const firstCell = cellCollection[0];
+    if (firstCell === null || firstCell === undefined || placed === true) {
+      return;
+    }
+    firstCell.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      cellCollection.forEach((element) => {
+        if (element !== null) {
+          element.classList.remove(`${addedClass}`);
+        }
+      });
+    });
+  }
 
   async function shipScreen(playerObj) {
-    // need async function to wait for each player ship selection to be resolved before moving on to the next one
+    //index.js loop suspended until each player places ships
     return new Promise((resolve) => {
       // clear page container and populate with ship select
       const htmlContent = `
@@ -180,19 +248,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       schoonCountBox.textContent = `x ${schoonCount}`;
       sloopCountBox.textContent = `x ${sloopCount}`;
       // build the visual grid
-      for (let i = 0; i < gridSize; i++) {
-        const row = document.createElement("div");
-        row.classList.add("rowCont");
-        gridContainer.appendChild(row);
-
-        for (let j = 0; j < gridSize; j++) {
-          const cell = document.createElement("div");
-          cell.classList.add("cell");
-          cell.dataset.r = i;
-          cell.dataset.c = j;
-          row.appendChild(cell);
-        }
-      }
+      gridBuilder(gridContainer, 10);
       // cycle ship placement orientation, initialized to "h"
       const orientationBtn = document.querySelector(".orientationBtn");
       orientationBtn.addEventListener("click", (e) => {
@@ -230,57 +286,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         randomBtnFn();
       });
 
-      const gridShader = (
-        coord,
-        length,
-        orientation,
-        dragFits,
-        placed = false,
-      ) => {
-        const offsetr = orientation === "h" ? 0 : 1;
-        const offsetc = orientation === "h" ? 1 : 0;
-        let addedClass = "";
-
-        // 3 shading possiblities fits/nofits/placed
-        if (placed === true) {
-          addedClass = "placed";
-        } else {
-          addedClass = dragFits === true ? "fits" : "notFits";
-        }
-
-        const currentCoord = [...coord];
-        let cellCollection = [];
-
-        // shade each cell representing ship length
-        for (let i = 0; i < length; i++) {
-          const currentCell = document.querySelector(
-            `[data-r="${currentCoord[0]}"][data-c="${currentCoord[1]}"]`,
-          );
-          cellCollection.push(currentCell);
-
-          if (currentCell !== null) {
-            currentCell.classList.add(`${addedClass}`);
-          } else {
-            continue;
-          }
-          currentCoord[0] += offsetr;
-          currentCoord[1] += offsetc;
-        }
-        // after shade, dragleave handler to clear shading when not placed
-        const firstCell = cellCollection[0];
-        if (firstCell === null || firstCell === undefined || placed === true) {
-          return;
-        }
-        firstCell.addEventListener("dragleave", (e) => {
-          e.preventDefault();
-          cellCollection.forEach((element) => {
-            if (element !== null) {
-              element.classList.remove(`${addedClass}`);
-            }
-          });
-        });
-      };
-
       function leaveScreen() {
         return;
       }
@@ -310,10 +315,24 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           console.log(`coord post shipmaker: ${coord}`);
           if (dragFits) {
             // add classname for fits
-            gridShader(coord, dragShipLength, orientation, dragFits, false);
+            gridShader(
+              coord,
+              dragShipLength,
+              orientation,
+              dragFits,
+              false,
+              gridContainer,
+            );
           } else {
             // add classname for not fits
-            gridShader(coord, dragShipLength, orientation, dragFits, false);
+            gridShader(
+              coord,
+              dragShipLength,
+              orientation,
+              dragFits,
+              false,
+              gridContainer,
+            );
           }
           coordCalculated = true;
           cell.removeEventListener("dragover", dragOverHandler);
@@ -348,7 +367,14 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             );
 
             if (placed) {
-              gridShader(coord, dragShipLength, orientation, dragFits, true);
+              gridShader(
+                coord,
+                dragShipLength,
+                orientation,
+                dragFits,
+                true,
+                gridContainer,
+              );
 
               let remainingShips = "";
 
@@ -432,28 +458,19 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
 
       const gridSize = 10;
       const gridContainer = document.querySelector(".strikeGridCont");
+      const shipPlaceGrid = document.querySelector(".shipPlacedGrid");
       let ableToStrike = undefined;
+      let tookTurn = false;
       const hitSVG = document.createElement("div");
       hitSVG.innerHTML = `<svg class="hitIcon" xmlns ="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
           <path xmlns="http://www.w3.org/2000/svg" d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
         </svg>`;
       const missSvg = document.createElement("div");
       missSvg.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-480Zm0 280q-116 0-198-82t-82-198q0-116 82-198t198-82q116 0 198 82t82 198q0 116-82 198t-198 82Zm0-80q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680q-83 0-141.5 58.5T280-480q0 83 58.5 141.5T480-280Z"/></svg>`;
+      const nextBtn = document.createElement("button");
 
       // build the strike grid
-      for (let i = 0; i < gridSize; i++) {
-        const row = document.createElement("div");
-        row.classList.add("rowCont");
-        gridContainer.appendChild(row);
-
-        for (let j = 0; j < gridSize; j++) {
-          const cell = document.createElement("div");
-          cell.classList.add("cell");
-          cell.dataset.r = i;
-          cell.dataset.c = j;
-          row.appendChild(cell);
-        }
-      }
+      gridBuilder(gridContainer, 10);
       // placed ships grid should be a fn declared above and called here
       // no event listeners but will show missed shots and sunk ships
 
@@ -478,10 +495,15 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             coord,
             enemyClass.playerBoard,
           );
-          if (canStrike) {
+          if (canStrike && !tookTurn) {
+            tookTurn = true;
             // send signal to strike to gameTurn
             const response = gameTurnScript(coord, playerClass, enemyClass);
+            const nextBtn = document.createElement("button");
             console.log(response);
+            nextBtn.textContent = "End Turn";
+            pageContainer.appendChild(nextBtn);
+
             if (response !== "miss") {
               cell.classList.add("hit");
               const cloneSVG = hitSVG.cloneNode(true);
@@ -493,15 +515,32 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               cell.appendChild(cloneSVG);
               // show the visual miss on the cell
             }
-          } else {
-            // add classname for not able to strike
+            // show the button for next
+
+            nextBtn.addEventListener("click", () => {
+              resolve();
+              console.log(
+                "there should be some resolving of promises happening right now",
+              );
+            });
           }
         });
       });
 
-      console.log(
-        `this is being called from strike screen for player ${playerClass.number}`,
-      );
+      // build the shipPlacedGrid
+      gridBuilder(shipPlaceGrid, 10);
+
+      function placeShips(playerClass) {
+        const shipsArray = playerClass.playerBoard.ships;
+        shipsArray.forEach((ship) => {
+          const length = ship.length;
+          const coord = ship.coordinates;
+          const orientation = ship.orientation;
+
+          gridShader(coord, length, orientation, null, true, shipPlaceGrid);
+        });
+      }
+      placeShips(playerClass);
     });
   }
   async function startScreen() {

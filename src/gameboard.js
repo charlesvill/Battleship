@@ -66,6 +66,8 @@ const gameBoard = () => {
         console.error("error: ship did not fit");
       }
     }
+    ship.coordinates = [...coordinates];
+    ship.orientation = orientation;
   }
 
   function canStrike(coordinates) {
