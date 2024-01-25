@@ -3,6 +3,10 @@
 const player = (playerObj, boardFn) => {
   const playerBoard = boardFn;
   const isCPU = playerObj.player === "person" ? false : true;
+  const strikes = {
+    misses: [],
+    hits: [],
+  };
 
   function canStrike(coordinates, enemyBoard) {
     return enemyBoard.canStrike(coordinates);
@@ -16,7 +20,7 @@ const player = (playerObj, boardFn) => {
     return "try another attack";
   }
 
-  return { ...playerObj, playerBoard, canStrike, attack, isCPU };
+  return { ...playerObj, playerBoard, canStrike, attack, isCPU, strikes };
 };
 
 module.exports = player;

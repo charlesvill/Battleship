@@ -1,5 +1,3 @@
-// tests for cpu player will be placed in player.test.js
-// hit bool might not play a role, remember to delete if no role.
 const cpuPlayer = () => {
   let state = "random";
   let hit = false;
@@ -113,12 +111,3 @@ const cpuPlayer = () => {
   };
 };
 module.exports = cpuPlayer;
-
-// attack on player class accepts a coordinate pair. how that pair gets formulated does not matter
-// have a general nextMove function that will intelligently determine what function will be called
-// according to the current state of hits.
-// the information you would need record when you have two hits. if you have two hits you need to figure out the orientation of that ship and repeatedly (loop) strike inline until there is a sunk ship.
-//
-// conclusion: there definitely needs to be a way for the gameboard to communicate back to the cpu script.
-//
-// callback fns that check on each move? or is it fed to the cpu script by the gameloop?

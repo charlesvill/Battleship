@@ -469,15 +469,42 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       missSvg.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-480Zm0 280q-116 0-198-82t-82-198q0-116 82-198t198-82q116 0 198 82t82 198q0 116-82 198t-198 82Zm0-80q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680q-83 0-141.5 58.5T280-480q0 83 58.5 141.5T480-280Z"/></svg>`;
       const nextBtn = document.createElement("button");
 
-      // build the strike grid
-      gridBuilder(gridContainer, 10);
-      // placed ships grid should be a fn declared above and called here
-      // no event listeners but will show missed shots and sunk ships
+      function prevStrikePopulator(
+        playerClass,
+        hitSVG,
+        missSvg,
+        gridContainer,
+      ) {
+        const gridContainerName = gridContainer.classList.value;
+        const missArr = playerClass.strikes.misses;
+        const hitsArr = playerClass.strikes.hits;
 
-      const cells = document.querySelectorAll(".cell");
+        missArr.forEach((coordPair) => {
+          const currentCell = document.querySelector(
+            `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
+          );
+          currentCell.classList.add("miss");
+          const cloneSVG = missSvg.cloneNode(true);
+          currentCell.appendChild(cloneSVG);
+        });
+        hitsArr.forEach((coordPair) => {
+          const currentCell = document.querySelector(
+            `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
+          );
+          currentCell.classList.add("hit");
+          const cloneSVG = hitSVG.cloneNode(true);
+          currentCell.appendChild(cloneSVG);
+        });
+      }
+      // build the strike grid && populate previous strikes if applicable
+      gridBuilder(gridContainer, 10);
+      prevStrikePopulator(playerClass, hitSVG, missSvg, gridContainer);
+      console.log("this s called after strike populator");
+
       // translates UI cell to a coordinate
       // checks if there was already a hit in the grid square
 
+      const cells = document.querySelectorAll(".cell");
       cells.forEach((cell) => {
         cell.addEventListener("click", (e) => {
           e.preventDefault();
@@ -508,11 +535,15 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               cell.classList.add("hit");
               const cloneSVG = hitSVG.cloneNode(true);
               cell.appendChild(cloneSVG);
+              playerClass.strikes.hits.push(coord);
+              console.dir(playerClass);
               // show the visual hit on the cell
             } else {
               cell.classList.add("miss");
               const cloneSVG = missSvg.cloneNode(true);
               cell.appendChild(cloneSVG);
+              playerClass.strikes.misses.push(coord);
+              console.dir(playerClass);
               // show the visual miss on the cell
             }
             // show the button for next
