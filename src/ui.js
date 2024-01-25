@@ -473,24 +473,32 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         playerClass,
         hitSVG,
         missSvg,
-        gridContainer,
+        gridCont,
+        hitsOnly = false,
       ) {
-        const gridContainerName = gridContainer.classList.value;
+        const gridContainerName = gridCont.classList.value;
         const missArr = playerClass.strikes.misses;
         const hitsArr = playerClass.strikes.hits;
 
-        missArr.forEach((coordPair) => {
-          const currentCell = document.querySelector(
-            `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
-          );
-          currentCell.classList.add("miss");
-          const cloneSVG = missSvg.cloneNode(true);
-          currentCell.appendChild(cloneSVG);
-        });
+        console.log(gridContainerName);
+        console.log(gridCont);
+        // for viewing which of your ships are hit, passthrough enemyClass instead of current player
+        if (hitsOnly === false) {
+          missArr.forEach((coordPair) => {
+            const currentCell = document.querySelector(
+              `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
+            );
+            console.log(currentCell);
+            currentCell.classList.add("miss");
+            const cloneSVG = missSvg.cloneNode(true);
+            currentCell.appendChild(cloneSVG);
+          });
+        }
         hitsArr.forEach((coordPair) => {
           const currentCell = document.querySelector(
             `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
           );
+          console.log(currentCell);
           currentCell.classList.add("hit");
           const cloneSVG = hitSVG.cloneNode(true);
           currentCell.appendChild(cloneSVG);
@@ -498,7 +506,11 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       }
       // build the strike grid && populate previous strikes if applicable
       gridBuilder(gridContainer, 10);
+      // build the shipPlacedGrid
+      gridBuilder(shipPlaceGrid, 10);
       prevStrikePopulator(playerClass, hitSVG, missSvg, gridContainer);
+      // populate which of your ships are hit
+      prevStrikePopulator(enemyClass, hitSVG, missSvg, shipPlaceGrid, true);
       console.log("this s called after strike populator");
 
       // translates UI cell to a coordinate
@@ -557,9 +569,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           }
         });
       });
-
-      // build the shipPlacedGrid
-      gridBuilder(shipPlaceGrid, 10);
 
       function placeShips(playerClass) {
         const shipsArray = playerClass.playerBoard.ships;
