@@ -28,7 +28,8 @@ const ship = (length) => {
 
   function hit() {
     damage++;
-    return `${type} was hit. ${hitpoints()} hitpoints remaining`;
+    //return `${type} was hit. ${hitpoints()} hitpoints remaining`;
+    return `hit`;
   }
   function isSunk() {
     return damage >= length ? true : false;

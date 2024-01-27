@@ -262,17 +262,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           orientationBtn.textContent = "Horizontal";
         }
       });
-
-      function shipDragHandler(e) {
-        dragShipLength = Number(e.currentTarget.dataset.index);
-
-        const clone = ship.cloneNode(true);
-        dragShip = ship;
-        // Set the offset for the drag image
-        const offsetX = 20; // Set your desired offset value
-        e.dataTransfer.setDragImage(clone, 0, 0);
-        ship.classList.add("dragging");
-      }
       function randomBtnFn() {
         console.log(playerObj);
         shipRandomizer(playerObj);
@@ -352,7 +341,20 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       shipIMG.style.width = "1rem";
 
       ships.forEach((ship) => {
-        ship.addEventListener("dragstart", shipDragHandler);
+        function shipDragHandler(e) {
+          dragShipLength = Number(e.currentTarget.dataset.index);
+
+          const clone = ship.cloneNode(true);
+          dragShip = ship;
+          // Set the offset for the drag image
+          const offsetX = 20; // Set your desired offset value
+          e.dataTransfer.setDragImage(clone, 0, 0);
+          ship.classList.add("dragging");
+        }
+
+        ship.addEventListener("dragstart", (e) => {
+          shipDragHandler(e);
+        });
 
         ship.addEventListener("dragend", () => {
           ship.classList.remove("dragging");
@@ -443,7 +445,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
        </div>
        <div class="strikeCont">
            <div class="strikeGridCont">
-               <span>Strike Result</span>
+               <span class="strikeResult">Strike Result</span>
            </div>
            <div class="shipPlacedCont">
                <div class="shipPlacedGrid"></div>
@@ -456,6 +458,8 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       pageContainer.innerHTML = "";
       pageContainer.innerHTML = htmlContent;
 
+      const playerName = document.querySelector(".playerName");
+      const strikeResultCont = document.querySelector(".strikeResult");
       const gridSize = 10;
       const gridContainer = document.querySelector(".strikeGridCont");
       const shipPlaceGrid = document.querySelector(".shipPlacedGrid");
@@ -504,6 +508,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           currentCell.appendChild(cloneSVG);
         });
       }
+      playerName.textContent = `Player ${playerClass.number} Turn`;
       // build the strike grid && populate previous strikes if applicable
       gridBuilder(gridContainer, 10);
       // build the shipPlacedGrid
@@ -539,7 +544,8 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             // send signal to strike to gameTurn
             const response = gameTurnScript(coord, playerClass, enemyClass);
             const nextBtn = document.createElement("button");
-            console.log(response);
+            strikeResultCont.textContent =
+              strikeResultCont.textContent + ": " + response;
             nextBtn.textContent = "End Turn";
             pageContainer.appendChild(nextBtn);
 

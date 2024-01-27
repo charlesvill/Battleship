@@ -79,12 +79,13 @@ const gameModule = () => {
 
   // gameTurn is called by event handler on UI interaction -or- by recursion when its cpu turn
   function gameTurn(coordinates = "", playerClass, enemyClass) {
+    const shipCheck = enemyClass.playerBoard.shipsRemaining();
+    console.log(shipCheck);
     if (gameOver) {
       return endGame();
     }
-
     // return value anything other than num = player loses
-    if (isNaN(enemyClass.playerBoard.shipsRemaining())) {
+    if (isNaN(shipCheck)) {
       gameOver = true;
       // return endGame(player1); this needs to be refactored
     }
@@ -106,13 +107,7 @@ const gameModule = () => {
         // strikeScreen will call take turn and await the results
         // of that strike. then will return to this once its done
         await ui.strikeScreen(currentPlayer, enemyClass, gameTurn);
-        console.log("this should not be printing yet");
       } else {
-        // there is a chance could use strike screen for CPU for the purposes of
-        // showing the strike that cpu will place;
-        // would need to give the strikescreen the cpu wrapper so it can trigger
-        // the cpu fns from strike screen
-
         gameTurn();
       }
 
