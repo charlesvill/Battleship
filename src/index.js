@@ -79,6 +79,8 @@ const gameModule = () => {
 
   // gameTurn is called by event handler on UI interaction -or- by recursion when its cpu turn
   function gameTurn(coordinates = "", playerClass, enemyClass) {
+    //response will mutate enemy board and shipcheck returns # of ships remaining
+    const response = playerClass.attack(coordinates, enemyClass.playerBoard);
     const shipCheck = enemyClass.playerBoard.shipsRemaining();
     console.log(shipCheck);
     if (gameOver) {
@@ -87,13 +89,13 @@ const gameModule = () => {
     // return value anything other than num = player loses
     if (isNaN(shipCheck)) {
       gameOver = true;
-      // return endGame(player1); this needs to be refactored
+      return endGame();
     }
     // how the cpu player is handled will need to be refactored as well.
     if (currentPlayer.isCPU === true) {
       return gameTurn();
     }
-    return playerClass.attack(coordinates, enemyClass.playerBoard);
+    return;
   }
 
   async function gameLoop() {

@@ -549,21 +549,23 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             nextBtn.textContent = "End Turn";
             pageContainer.appendChild(nextBtn);
 
-            if (response !== "miss") {
+            if (response === "hit") {
               cell.classList.add("hit");
               const cloneSVG = hitSVG.cloneNode(true);
               cell.appendChild(cloneSVG);
               playerClass.strikes.hits.push(coord);
               console.dir(playerClass);
-              // show the visual hit on the cell
+            } else if (response === undefined) {
+              console.error("Error: strike response exception");
+              return;
             } else {
               cell.classList.add("miss");
               const cloneSVG = missSvg.cloneNode(true);
               cell.appendChild(cloneSVG);
               playerClass.strikes.misses.push(coord);
               console.dir(playerClass);
-              // show the visual miss on the cell
             }
+
             // show the button for next
 
             nextBtn.addEventListener("click", () => {
