@@ -10,6 +10,7 @@ const gameModule = () => {
   // the game initializer will use this function for connecting cpu AI to other functions
   const cpuPlayerWrapper = (playerClass, cpuAI, enemyBoard) => {
     // this wrapper will need to be refactored after changes to player class
+    console.log(playerClass);
     function attack() {
       let nextStrike = cpuAI.nextMove();
       while (playerClass.canStrike(nextStrike, enemyBoard) === false) {
@@ -28,7 +29,7 @@ const gameModule = () => {
     // there could be a problem with returning the whole class because of the attack fn being on the same level
     // as cpu player wrapper. come back to this, maybe do not spread the whole class but pieces of it.
     return {
-      ...playerClass.playerObj,
+      ...({ canStrike, strikes } = playerClass),
       attack,
       playerBoard: playerClass.playerBoard,
       isCPU: playerClass.isCPU,
@@ -94,7 +95,7 @@ const gameModule = () => {
     // how the cpu player is handled will need to be refactored as well.
     // this might actually be deleted since gameloop will call gameturn fn
     if (currentPlayer.isCPU === true) {
-      return gameTurn();
+      console.log("cpu turn would be triggered from gameturn");
     }
     return response;
   }
@@ -102,13 +103,13 @@ const gameModule = () => {
   async function gameLoop() {
     // while game is not over
     console.log("greetings from gameloop");
-    console.dir(currentPlayer);
     // call ui strikescreen for current player if its a person
     while (gameOver === false) {
+      console.dir(currentPlayer);
+
+      // current player check is failing, passingthrough cpu player to strikescreen
       if (!currentPlayer.isCpu) {
         const enemyClass = currentPlayer === player1 ? player2 : player1;
-        // strikeScreen will call take turn and await the results
-        // of that strike. then will return to this once its done
         await ui.strikeScreen(currentPlayer, enemyClass, gameTurn);
       } else {
         gameTurn();
@@ -139,6 +140,7 @@ const gameModule = () => {
 
     currentPlayer = player1;
     console.log(currentPlayer);
+    console.log(player2);
     gameLoop();
 
     // will initialize the game loop fn that will call ui for strike screens

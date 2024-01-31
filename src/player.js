@@ -14,8 +14,15 @@ const player = (playerObj, boardFn) => {
 
   function attack(coordinates, enemyBoard) {
     // will need code here for determining legal move
+    let result = undefined;
     if (canStrike(coordinates, enemyBoard)) {
-      return enemyBoard.receiveAttack(coordinates);
+      result = enemyBoard.receiveAttack(coordinates);
+      if (result === "hit") {
+        strikes.hits.push(coordinates);
+      } else if (result === "miss") {
+        strikes.hits.push(coordinates);
+      }
+      return result;
     }
     return "try another attack";
   }

@@ -481,11 +481,9 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         hitsOnly = false,
       ) {
         const gridContainerName = gridCont.classList.value;
+        console.log(playerClass);
         const missArr = playerClass.strikes.misses;
         const hitsArr = playerClass.strikes.hits;
-
-        console.log(gridContainerName);
-        console.log(gridCont);
         // for viewing which of your ships are hit, passthrough enemyClass instead of current player
         if (hitsOnly === false) {
           missArr.forEach((coordPair) => {
@@ -553,7 +551,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               cell.classList.add("hit");
               const cloneSVG = hitSVG.cloneNode(true);
               cell.appendChild(cloneSVG);
-              playerClass.strikes.hits.push(coord);
               console.dir(playerClass);
             } else if (response === undefined) {
               console.error("Error: strike response exception");
@@ -562,7 +559,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               cell.classList.add("miss");
               const cloneSVG = missSvg.cloneNode(true);
               cell.appendChild(cloneSVG);
-              playerClass.strikes.misses.push(coord);
               console.dir(playerClass);
             }
 
