@@ -92,10 +92,11 @@ const gameModule = () => {
       return endGame();
     }
     // how the cpu player is handled will need to be refactored as well.
+    // this might actually be deleted since gameloop will call gameturn fn
     if (currentPlayer.isCPU === true) {
       return gameTurn();
     }
-    return;
+    return response;
   }
 
   async function gameLoop() {
