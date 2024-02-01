@@ -26,8 +26,6 @@ const gameModule = () => {
         return strikeResult;
       }
     }
-    // there could be a problem with returning the whole class because of the attack fn being on the same level
-    // as cpu player wrapper. come back to this, maybe do not spread the whole class but pieces of it.
     return {
       ...({ canStrike, strikes } = playerClass),
       attack,
@@ -79,7 +77,7 @@ const gameModule = () => {
   }
 
   // gameTurn is called by event handler on UI interaction -or- by recursion when its cpu turn
-  function gameTurn(coordinates = "", playerClass, enemyClass) {
+  function gameTurn(playerClass, enemyClass, coordinates = "") {
     //response will mutate enemy board and shipcheck returns # of ships remaining
     const response = playerClass.attack(coordinates, enemyClass.playerBoard);
     const shipCheck = enemyClass.playerBoard.shipsRemaining();
@@ -108,11 +106,11 @@ const gameModule = () => {
       console.dir(currentPlayer);
 
       // current player check is failing, passingthrough cpu player to strikescreen
-      if (!currentPlayer.isCpu) {
-        const enemyClass = currentPlayer === player1 ? player2 : player1;
+      const enemyClass = currentPlayer === player1 ? player2 : player1;
+      if (!currentPlayer.isCPU) {
         await ui.strikeScreen(currentPlayer, enemyClass, gameTurn);
       } else {
-        gameTurn();
+        gameTurn(currentPlayer, enemyClass);
       }
 
       if (currentPlayer === player1) {

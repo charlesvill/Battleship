@@ -540,7 +540,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           if (canStrike && !tookTurn) {
             tookTurn = true;
             // send signal to strike to gameTurn
-            const response = gameTurnScript(coord, playerClass, enemyClass);
+            const response = gameTurnScript(playerClass, enemyClass, coord);
             const nextBtn = document.createElement("button");
             strikeResultCont.textContent =
               strikeResultCont.textContent + ": " + response;
