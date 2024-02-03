@@ -540,24 +540,25 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           if (canStrike && !tookTurn) {
             tookTurn = true;
             // send signal to strike to gameTurn
+            // response will return obj with .hitReport & .isSunk
             const response = gameTurnScript(playerClass, enemyClass, coord);
             const nextBtn = document.createElement("button");
             strikeResultCont.textContent =
-              strikeResultCont.textContent + ": " + response;
+              strikeResultCont.textContent + ": " + response.hitReport;
             nextBtn.textContent = "End Turn";
             pageContainer.appendChild(nextBtn);
 
-            if (response === "hit") {
-              cell.classList.add("hit");
-              const cloneSVG = hitSVG.cloneNode(true);
+            if (response.hitReport === "miss") {
+              cell.classList.add("miss");
+              const cloneSVG = missSvg.cloneNode(true);
               cell.appendChild(cloneSVG);
               console.dir(playerClass);
-            } else if (response === undefined) {
+            } else if (response.hitReport === undefined) {
               console.error("Error: strike response exception");
               return;
             } else {
-              cell.classList.add("miss");
-              const cloneSVG = missSvg.cloneNode(true);
+              cell.classList.add("hit");
+              const cloneSVG = hitSVG.cloneNode(true);
               cell.appendChild(cloneSVG);
               console.dir(playerClass);
             }

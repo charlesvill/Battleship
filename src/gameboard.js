@@ -73,6 +73,9 @@ const gameBoard = () => {
   function canStrike(coordinates) {
     const [r, c] = coordinates;
     const strikeSquare = attacksReceived[r][c];
+    console.log(strikeSquare);
+    console.log(r);
+    console.log(c);
 
     return strikeSquare === null ? true : false;
   }
@@ -80,24 +83,30 @@ const gameBoard = () => {
   function receiveAttack(coordinates) {
     const r = coordinates[0];
     const c = coordinates[1];
+    let hitReport = undefined;
+    let isSunk = undefined;
 
     if (shipGrid[r][c] !== null) {
       const ship = shipGrid[r][c];
       attacksReceived[r][c] = 1;
-      const hitReport = ship.hit();
+      hitReport = ship.hit();
+      isSunk = ship.isSunk();
 
-      if (ship.isSunk() === true) {
+      if (isSunk) {
         ships = ships.filter((element) => {
           return element !== ship;
         });
-        // function that reports if there are ships remaining.
-        return `${ship.type} has been sunk`;
+        hitReport = `${ship.type} has been sunk`;
+        // return statement is obj that contains the report as well isSunk
+        return { hitReport, isSunk };
       }
-      return hitReport;
+      return { hitReport, isSunk };
     }
     // record the miss
+    hitReport = "miss";
+    isSunk = "false";
     attacksReceived[r][c] = 0;
-    return "miss";
+    return { hitReport, isSunk };
   }
 
   function shipsRemaining() {

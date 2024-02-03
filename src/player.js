@@ -17,10 +17,12 @@ const player = (playerObj, boardFn) => {
     let result = undefined;
     if (canStrike(coordinates, enemyBoard)) {
       result = enemyBoard.receiveAttack(coordinates);
-      if (result === "hit") {
+      if (result.hitReport === "hit") {
         strikes.hits.push(coordinates);
-      } else if (result === "miss") {
+      } else if (result.isSunk === true) {
         strikes.hits.push(coordinates);
+      } else if (result.hitReport === "miss") {
+        strikes.misses.push(coordinates);
       }
       return result;
     }

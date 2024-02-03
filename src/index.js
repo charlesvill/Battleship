@@ -13,15 +13,18 @@ const gameModule = () => {
     console.log(playerClass);
     function attack() {
       let nextStrike = cpuAI.nextMove();
+      console.log(nextStrike);
       while (playerClass.canStrike(nextStrike, enemyBoard) === false) {
         nextStrike = cpuAI.nextMove();
+        console.log(nextStrike);
       }
       const strikeResult = playerClass.attack(nextStrike, enemyBoard);
+      console.log(strikeResult);
 
-      if (strikeResult !== "miss") {
-        cpuAI.reportHit(nextStrike);
+      if (strikeResult.hitReport !== "miss") {
+        cpuAI.reportHit(nextStrike, strikeResult.isSunk);
         return strikeResult;
-      } else if (strikeResult === "miss") {
+      } else if (strikeResult.hitReport === "miss") {
         cpuAI.reportMiss();
         return strikeResult;
       }
@@ -79,6 +82,7 @@ const gameModule = () => {
   // gameTurn is called by event handler on UI interaction -or- by recursion when its cpu turn
   function gameTurn(playerClass, enemyClass, coordinates = "") {
     //response will mutate enemy board and shipcheck returns # of ships remaining
+    // response returns an object with .hitReport & .isSunk
     const response = playerClass.attack(coordinates, enemyClass.playerBoard);
     const shipCheck = enemyClass.playerBoard.shipsRemaining();
     console.log(shipCheck);
@@ -92,9 +96,6 @@ const gameModule = () => {
     }
     // how the cpu player is handled will need to be refactored as well.
     // this might actually be deleted since gameloop will call gameturn fn
-    if (currentPlayer.isCPU === true) {
-      console.log("cpu turn would be triggered from gameturn");
-    }
     return response;
   }
 
