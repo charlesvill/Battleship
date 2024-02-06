@@ -15,7 +15,8 @@ const gameModule = () => {
       let nextStrike = cpuAI.nextMove();
       console.log(nextStrike);
       while (playerClass.canStrike(nextStrike, enemyBoard) === false) {
-        nextStrike = cpuAI.nextMove();
+        const repeatMove = true;
+        nextStrike = cpuAI.nextMove(repeatMove);
         console.log(nextStrike);
       }
       const strikeResult = playerClass.attack(nextStrike, enemyBoard);

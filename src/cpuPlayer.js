@@ -49,26 +49,35 @@ const cpuPlayer = () => {
 
     if (pursuitAxis === "h") {
       inlineStrike[1] += offsetValue;
-      return inlineStrike;
     } else if (pursuitAxis === "v") {
       inlineStrike[0] += offsetValue;
-      return inlineStrike;
     }
+    if (
+      inlineStrike[0] < 0 ||
+      inlineStrike[1] < 0 ||
+      inlineStrike[0] > 9 ||
+      inlineStrike[1] > 9
+    ) {
+      const redo = getNextInline(lastHit);
+      inlineStrike = redo;
+    }
+    return inlineStrike;
   }
 
-  function inlineMove() {
+  function inlineMove(repeat = false) {
     // finds the axis by comparing hits and calls an inline guess
+    // p1 & 2 refer to the 1st/2nd pair of hits to analyze
     if (pursuitAxis === null) {
-      const [c1, c2] = hitArr;
-      if (c1[0] === c2[0] && c1[1] !== c2[1]) {
+      const [p1, p2] = hitArr;
+      if (p1[0] === p2[0] && p1[1] !== p2[1]) {
         pursuitAxis = "h";
-        return getNextInline(c2);
-      } else if (c1[0] !== c2[0] && c1[1] === c2[1]) {
+        return getNextInline(p2);
+      } else if (p1[0] !== p2[0] && p1[1] === p2[1]) {
         pursuitAxis = "v";
-        return getNextInline(c2);
+        return getNextInline(p2);
       }
     } else {
-      if (streak === false) {
+      if (streak === false || repeat === true) {
         return getNextInline(hitArr[0]);
       }
       return getNextInline(hitArr[hitArr.length - 1]);
@@ -76,7 +85,7 @@ const cpuPlayer = () => {
       // take the last known hit and add to it
     }
   }
-  function nextMove() {
+  function nextMove(repeat = false) {
     switch (state) {
       case "random":
         return randomMove();
@@ -85,7 +94,7 @@ const cpuPlayer = () => {
         return adjacentMove();
         break;
       case "inline":
-        return inlineMove();
+        return inlineMove(repeat);
         break;
       default:
         return "Error condition exception: nextMove";
