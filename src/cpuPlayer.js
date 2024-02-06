@@ -27,6 +27,16 @@ const cpuPlayer = () => {
     const binaryOffset = Math.floor(Math.random() * 2);
     const offsetValue = binaryOffset === 0 ? -1 : 1;
     adjacentStrike[axis] += offsetValue;
+    //check to protect outofbounds strikes
+    if (
+      adjacentStrike[0] < 0 ||
+      adjacentStrike[1] < 0 ||
+      adjacentStrike[0] > 9 ||
+      adjacentStrike[1] > 9
+    ) {
+      const redo = adjacentMove();
+      adjacentStrike = redo;
+    }
 
     return adjacentStrike;
   }
@@ -85,15 +95,16 @@ const cpuPlayer = () => {
     streak = true;
     if (isSunk === true) {
       hit = false;
-      mode = "random";
+      state = "random";
       hitArr = [];
       pursuitAxis = null;
-    }
-    hitArr.push(coordinate);
-    if (hitArr.length === 1) {
-      state = "adjacent";
-    } else if (hitArr.length > 1) {
-      state = "inline";
+    } else {
+      hitArr.push(coordinate);
+      if (hitArr.length === 1) {
+        state = "adjacent";
+      } else if (hitArr.length > 1) {
+        state = "inline";
+      }
     }
   }
   function reportMiss() {
