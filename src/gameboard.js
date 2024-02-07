@@ -18,10 +18,8 @@ const gameBoard = () => {
 
   function shipPerimeter(bowPos, length, orientation, callbackfn) {
     // this fn defines 4 areas top, L, R, bottom and calls injected function
-    // on each of the squares. it is expected that the callbackfn return bool
-    // the result of this call would be the successful
+    // on each of the squares it is expected that the callbackfn return bool
 
-    // need to come back here to make sure that attempting to go out of bounds wont break it.
     // the 0 means that the row will be added offset to draw border above ship
     const axisOffset = orientation === "h" ? 0 : 1;
     const axisCounter = orientation === "h" ? 1 : 0;
@@ -67,15 +65,11 @@ const gameBoard = () => {
       }
       rowA[axisCounter] += 1;
       rowB[axisCounter] += 1;
-
-      //insert logic here for what happens to each of the squares
     }
-
     return true;
   }
 
   function shipFits(length, coordinates, orientation) {
-    // refactor to if pass initial test, then do perimeter test w/ callbackfn
     const copyCoord = [...coordinates];
     let r = copyCoord[0];
     let c = copyCoord[1];
@@ -104,7 +98,7 @@ const gameBoard = () => {
       (point) => {
         const r = point[0];
         const c = point[1];
-        // check if extends beyond boundary. no need to check if it does.
+        // check if extends beyond boundary, skips if so
         if (r <= -1 || r >= 10 || c <= -1 || c >= 10) {
           return true;
         }
@@ -114,8 +108,7 @@ const gameBoard = () => {
         return false;
       },
     );
-
-    // return the results of perimeter check as ship will fit if its gotten this far
+    // true perimeterCheck indicates ship fits
     return perimeterCheck;
   }
 
@@ -135,7 +128,7 @@ const gameBoard = () => {
       (point) => {
         const r = point[0];
         const c = point[1];
-        // check if extends beyond boundary. no need to check if it does.
+        // check if extends beyond boundary
         if (r <= -1 || r >= 10 || c <= -1 || c >= 10) {
           return true;
         }
@@ -203,7 +196,6 @@ const gameBoard = () => {
       }
       return { hitReport, isSunk };
     }
-    // record the miss
     hitReport = "miss";
     isSunk = "false";
     attacksReceived[r][c] = 0;

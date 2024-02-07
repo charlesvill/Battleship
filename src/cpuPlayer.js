@@ -16,7 +16,6 @@ const cpuPlayer = () => {
     return randomCoord;
   }
 
-  // will need to implement the legal move -> dependency injection from gameboard script
   function adjacentMove() {
     // will return coordinate in either same row or column as lastHit
     const [lastHit] = hitArr;
@@ -42,7 +41,6 @@ const cpuPlayer = () => {
   }
 
   function getNextInline(lastHit) {
-    // will need to guess next one until you have a legal one that hasnt been used yet
     const binaryOffset = Math.floor(Math.random() * 2);
     const offsetValue = binaryOffset === 0 ? -1 : 1;
     let inlineStrike = [...lastHit];
@@ -71,10 +69,8 @@ const cpuPlayer = () => {
       if (streak === false) {
         return getNextInline(hitArr[0]);
       }
-      // if length -1 was stored then maybe could eventually get back to the beginning of the hit array.
       return getNextInline(hitArr[hitArr.length - 1]);
       // condition if the last strike was a miss then start from the front of the list
-      // take the last known hit and add to it
     }
   }
   function nextMove() {
@@ -111,7 +107,6 @@ const cpuPlayer = () => {
   function reportMiss() {
     streak = false;
   }
-  // report miss function?
   return {
     randomMove,
     adjacentMove,

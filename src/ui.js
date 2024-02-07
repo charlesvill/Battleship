@@ -156,7 +156,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
   }
 
   async function shipScreen(playerObj) {
-    //index.js loop suspended until each player places ships
     return new Promise((resolve) => {
       // clear page container and populate with ship select
       const htmlContent = `
@@ -223,7 +222,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       let schoonCount = 3;
       let sloopCount = 2;
       let depletedShip = null;
-      console.log(`the current player is: ${playerObj.number}`);
 
       let ships = document.querySelectorAll(".ship");
       let shipContainer = document.querySelector(".shipBox");
@@ -253,6 +251,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           orientationBtn.textContent = "Horizontal";
         }
       });
+
       function randomBtnFn() {
         console.log(playerObj);
         shipRandomizer(playerObj);
@@ -294,7 +293,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           );
           console.log(`coord post shipmaker: ${coord}`);
           if (dragFits) {
-            // add classname for fits
             gridShader(
               coord,
               dragShipLength,
@@ -304,7 +302,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               gridContainer,
             );
           } else {
-            // add classname for not fits
             gridShader(
               coord,
               dragShipLength,
@@ -338,7 +335,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           const clone = ship.cloneNode(true);
           dragShip = ship;
           // Set the offset for the drag image
-          const offsetX = 20; // Set your desired offset value
+          const offsetX = 20;
           e.dataTransfer.setDragImage(clone, 0, 0);
           ship.classList.add("dragging");
         }
@@ -418,16 +415,12 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
 
             nextBtn.addEventListener("click", () => {
               resolve();
-              console.log(
-                "there should be some resolving of promises happening right now",
-              );
             });
           }
         });
       });
     });
   }
-  // possibly for cpu, still call SS but do not wipe html and just show the effect of hitting one of the other player ships.
   // gameTurn requires coordinates, playerClass, enemyClass
   async function strikeScreen(playerClass, enemyClass, gameTurnScript) {
     return new Promise((resolve) => {
@@ -481,7 +474,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             const currentCell = document.querySelector(
               `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
             );
-            console.log(currentCell);
             currentCell.classList.add("miss");
             const cloneSVG = missSvg.cloneNode(true);
             currentCell.appendChild(cloneSVG);
@@ -505,16 +497,11 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       prevStrikePopulator(playerClass, hitSVG, missSvg, gridContainer);
       // populate which of your ships are hit
       prevStrikePopulator(enemyClass, hitSVG, missSvg, shipPlaceGrid, true);
-      console.log("this s called after strike populator");
-
-      // translates UI cell to a coordinate
-      // checks if there was already a hit in the grid square
 
       const cells = document.querySelectorAll(".cell");
       cells.forEach((cell) => {
         cell.addEventListener("click", (e) => {
           e.preventDefault();
-          // if struck already
           if (undefined) {
             return;
           }
@@ -553,8 +540,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               cell.appendChild(cloneSVG);
               console.dir(playerClass);
             }
-
-            // show the button for next
 
             nextBtn.addEventListener("click", () => {
               resolve();
@@ -652,9 +637,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         }
       }
       await processPlayers(players);
-      // index global variables should be populated with both players
-      // call to continue game should have index accessing global player
-      // objs and should work fine. but it is kinda sloppy
       // this passes over control back to the index script.
       gameInitScript();
     });
