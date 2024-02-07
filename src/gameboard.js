@@ -28,35 +28,47 @@ const gameBoard = () => {
     const aOffset = 1;
     const bOffset = -1;
 
-    const endcapA = [bowPos[0], bowPos[1] - 1];
-    const endcapB = [bowPos[0], bowPos[1] + length];
-    // this will need adjusting according to either v or h
+    let endcapA;
+    let endcapB;
+
+    // finds the point directly adjacent to bow and transom
+    if (orientation === "h") {
+      endcapA = [bowPos[0], bowPos[1] - 1];
+      endcapB = [bowPos[0], bowPos[1] + length];
+    } else {
+      endcapA = [bowPos[0] - 1, bowPos[1]];
+      endcapB = [bowPos[0] + length, bowPos[1]];
+    }
+
     let rowA = [...bowPos];
     let rowB = [...bowPos];
 
-    rowA[axis] += aOffset;
-    rowB[axis] += boffset;
+    rowA[axisOffset] += aOffset;
+    rowB[axisOffset] += bOffset;
+    // subtract by 1 to get corner spot diagonal to bow
+    rowA[axisCounter] += -1;
+    rowB[axisCounter] += -1;
 
-    const resultECA = callbackfn(rowA);
-    const resultECB = callbackfn(rowB);
+    const resultECA = callbackfn(endcapA);
+    const resultECB = callbackfn(endcapB);
 
     if (resultECA === false || resultECB === false) {
       return false;
     }
 
-    // i starts @ -1 to get the top corner square
-    for (let i = -1; i <= length; i++) {
-      rowA[axisCounter] += i;
-      rowB[axisCounter] += i;
+    for (let i = 0; i <= length; i++) {
       console.log(`rowA is ${rowA}`);
-
-      //insert logic here for what happens to each of the squares
+      console.log(`rowB is ${rowB}`);
 
       const resultA = callbackfn(rowA);
       const resultB = callbackfn(rowB);
       if (resultA === false || resultB === false) {
         return false;
       }
+      rowA[axisCounter] += 1;
+      rowB[axisCounter] += 1;
+
+      //insert logic here for what happens to each of the squares
     }
 
     return true;
@@ -92,6 +104,10 @@ const gameBoard = () => {
       (point) => {
         const r = point[0];
         const c = point[1];
+        // check if extends beyond boundary. no need to check if it does.
+        if (r <= -1 || r >= 10 || c <= -1 || c >= 10) {
+          return true;
+        }
         if (shipGrid[r][c] !== null) {
           return false;
         }
@@ -119,6 +135,10 @@ const gameBoard = () => {
       (point) => {
         const r = point[0];
         const c = point[1];
+        // check if extends beyond boundary. no need to check if it does.
+        if (r <= -1 || r >= 10 || c <= -1 || c >= 10) {
+          return true;
+        }
         shipGrid[r][c] = "x";
       },
     );
@@ -155,7 +175,10 @@ const gameBoard = () => {
     console.log(r);
     console.log(c);
 
-    return strikeSquare === null ? true : false;
+    if (strikeSquare !== null && shipGrid[r][c] !== "x") {
+      return true;
+    }
+    return false;
   }
 
   function receiveAttack(coordinates) {
@@ -164,7 +187,7 @@ const gameBoard = () => {
     let hitReport = undefined;
     let isSunk = undefined;
 
-    if (shipGrid[r][c] !== null) {
+    if (shipGrid[r][c] !== null && shipGrid[r][c] !== "x") {
       const ship = shipGrid[r][c];
       attacksReceived[r][c] = 1;
       hitReport = ship.hit();
