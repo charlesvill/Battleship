@@ -16,7 +16,54 @@ const gameBoard = () => {
   let shipGrid = gridMaker();
   let attacksReceived = gridMaker();
 
+  function shipPerimeter(bowPos, length, orientation, callbackfn) {
+    // this fn defines 4 areas top, L, R, bottom and calls injected function
+    // on each of the squares. it is expected that the callbackfn return bool
+    // the result of this call would be the successful
+
+    // need to come back here to make sure that attempting to go out of bounds wont break it.
+    // the 0 means that the row will be added offset to draw border above ship
+    const axisOffset = orientation === "h" ? 0 : 1;
+    const axisCounter = orientation === "h" ? 1 : 0;
+    const aOffset = 1;
+    const bOffset = -1;
+
+    const endcapA = [bowPos[0], bowPos[1] - 1];
+    const endcapB = [bowPos[0], bowPos[1] + length];
+    // this will need adjusting according to either v or h
+    let rowA = [...bowPos];
+    let rowB = [...bowPos];
+
+    rowA[axis] += aOffset;
+    rowB[axis] += boffset;
+
+    const resultECA = callbackfn(rowA);
+    const resultECB = callbackfn(rowB);
+
+    if (resultECA === false || resultECB === false) {
+      return false;
+    }
+
+    // i starts @ -1 to get the top corner square
+    for (let i = -1; i <= length; i++) {
+      rowA[axisCounter] += i;
+      rowB[axisCounter] += i;
+      console.log(`rowA is ${rowA}`);
+
+      //insert logic here for what happens to each of the squares
+
+      const resultA = callbackfn(rowA);
+      const resultB = callbackfn(rowB);
+      if (resultA === false || resultB === false) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   function shipFits(length, coordinates, orientation) {
+    // refactor to if pass initial test, then do perimeter test w/ callbackfn
     const copyCoord = [...coordinates];
     let r = copyCoord[0];
     let c = copyCoord[1];
@@ -37,15 +84,46 @@ const gameBoard = () => {
       r += roffset;
       c += coffset;
     }
-    return true;
+    // callbackfn checks each coord passed and return false if not null
+    const perimeterCheck = shipPerimeter(
+      coordinates,
+      length,
+      orientation,
+      (point) => {
+        const r = point[0];
+        const c = point[1];
+        if (shipGrid[r][c] !== null) {
+          return false;
+        }
+        return true;
+      },
+    );
+
+    // return the results of perimeter check as ship will fit if its gotten this far
+    return perimeterCheck;
   }
 
-  function pushtoGrid(ship, length, coordinates, offset) {
+  function pushtoGrid(ship, length, coordinates, orientation) {
+    const offset = orientation === "h" ? [0, 1] : [1, 0];
     let current = [...coordinates];
     for (let i = 0; i < length; i++) {
       shipGrid[current[0]][current[1]] = ship;
       current[0] += offset[0];
       current[1] += offset[1];
+    }
+    // return statement of true means successful
+    const buildPerimeter = shipPerimeter(
+      coordinates,
+      length,
+      orientation,
+      (point) => {
+        const r = point[0];
+        const c = point[1];
+        shipGrid[r][c] = "x";
+      },
+    );
+    if (buildPerimeter === false) {
+      throw new Error("Exception occured with building ship perimeter");
     }
   }
 
@@ -55,13 +133,13 @@ const gameBoard = () => {
 
     if (orientation === "h") {
       if (shipFits(length, coordinates, orientation)) {
-        pushtoGrid(ship, length, coordinates, [0, 1]);
+        pushtoGrid(ship, length, coordinates, orientation);
       } else {
         console.error("error: ship did not fit");
       }
     } else if (orientation === "v") {
       if (shipFits(length, coordinates, orientation)) {
-        pushtoGrid(ship, length, coordinates, [1, 0]);
+        pushtoGrid(ship, length, coordinates, orientation);
       } else {
         console.error("error: ship did not fit");
       }
