@@ -108,10 +108,10 @@ const gameBoard = () => {
         if (r <= -1 || r >= 10 || c <= -1 || c >= 10) {
           return true;
         }
-        if (shipGrid[r][c] !== null) {
-          return false;
+        if (shipGrid[r][c] === null || shipGrid[r][c] === "x") {
+          return true;
         }
-        return true;
+        return false;
       },
     );
 
@@ -175,10 +175,10 @@ const gameBoard = () => {
     console.log(r);
     console.log(c);
 
-    if (strikeSquare !== null && shipGrid[r][c] !== "x") {
-      return true;
+    if (strikeSquare !== null) {
+      return false;
     }
-    return false;
+    return true;
   }
 
   function receiveAttack(coordinates) {

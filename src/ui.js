@@ -35,16 +35,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       player: undefined,
       number: undefined,
       country: undefined,
-      ships: [
-        manowar,
-        frigate,
-        frigate,
-        schooner,
-        schooner,
-        schooner,
-        sloop,
-        sloop,
-      ],
+      ships: [manowar, frigate, frigate, schooner, schooner, sloop, sloop],
     };
     const player1 = { ...playerobj };
     const player2 = { ...playerobj };

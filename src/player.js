@@ -33,5 +33,3 @@ const player = (playerObj, boardFn) => {
 };
 
 module.exports = player;
-
-// the attack fn as of now does not work well with cpu player because it needs to be able to regenerate another move without leaving its current scope

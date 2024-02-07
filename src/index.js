@@ -167,6 +167,7 @@ const gameModule = () => {
   function endGame(winner) {
     // some shit here to end the game
     console.log("this mf over lol");
+    return isGameOver();
   }
 
   function isGameOver() {
