@@ -1,5 +1,6 @@
 const gameBoard = () => {
   let ships = [];
+  let streakArr = [];
   function gridMaker() {
     grid = [];
 
@@ -55,9 +56,6 @@ const gameBoard = () => {
     }
 
     for (let i = 0; i <= length; i++) {
-      console.log(`rowA is ${rowA}`);
-      console.log(`rowB is ${rowB}`);
-
       const resultA = callbackfn(rowA);
       const resultB = callbackfn(rowB);
       if (resultA === false || resultB === false) {
@@ -164,9 +162,6 @@ const gameBoard = () => {
   function canStrike(coordinates) {
     const [r, c] = coordinates;
     const strikeSquare = attacksReceived[r][c];
-    console.log(strikeSquare);
-    console.log(r);
-    console.log(c);
 
     if (strikeSquare !== null) {
       return false;
@@ -199,6 +194,9 @@ const gameBoard = () => {
     hitReport = "miss";
     isSunk = "false";
     attacksReceived[r][c] = 0;
+    console.log(hitReport);
+    console.log(`attempted Strike: ${r}, ${c}`);
+
     return { hitReport, isSunk };
   }
 
@@ -208,6 +206,7 @@ const gameBoard = () => {
 
   return {
     shipGrid,
+    streakArr,
     attacksReceived,
     ships,
     shipFits,

@@ -23,7 +23,9 @@ const gameModule = () => {
 
       if (strikeResult.hitReport !== "miss") {
         cpuAI.reportHit(nextStrike, strikeResult.isSunk);
-        return strikeResult;
+        enemyBoard.streakArr.push(nextStrike);
+
+        return attack();
       } else if (strikeResult.hitReport === "miss") {
         cpuAI.reportMiss();
         return strikeResult;

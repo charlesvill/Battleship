@@ -84,7 +84,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         );
       }
     });
-    console.dir(playerObj);
   }
   function gridBuilder(gridContainer, gridSize) {
     for (let i = 0; i < gridSize; i++) {
@@ -113,7 +112,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     const offsetc = orientation === "h" ? 1 : 0;
     let addedClass = "";
     const gridContainerName = gridContainer.classList.value;
-    console.log(gridContainerName);
 
     // 3 shading possiblities fits/nofits/placed
     if (placed === true) {
@@ -207,7 +205,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
      `;
       pageContainer.innerHTML = "";
       pageContainer.innerHTML = htmlContent;
-      console.log("dom finished loading");
 
       // necessary globals for methods in ship select
       const gridContainer = document.querySelector(".gridCont");
@@ -253,14 +250,12 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       });
 
       function randomBtnFn() {
-        console.log(playerObj);
         shipRandomizer(playerObj);
         resolve();
       }
 
       const randomBtn = document.querySelector(".randomBtn");
 
-      console.log(randomBtn);
       randomBtn.addEventListener("click", () => {
         randomBtnFn();
       });
@@ -291,7 +286,6 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             orientation,
             true,
           );
-          console.log(`coord post shipmaker: ${coord}`);
           if (dragFits) {
             gridShader(
               coord,
@@ -465,9 +459,9 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         hitsOnly = false,
       ) {
         const gridContainerName = gridCont.classList.value;
-        console.log(playerClass);
         const missArr = playerClass.strikes.misses;
         const hitsArr = playerClass.strikes.hits;
+        const enemyStreakArr = enemyClass.playerBoard.streakArr;
         // for viewing which of your ships are hit, passthrough enemyClass instead of current player
         if (hitsOnly === false) {
           missArr.forEach((coordPair) => {
@@ -483,11 +477,14 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           const currentCell = document.querySelector(
             `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
           );
-          console.log(currentCell);
           currentCell.classList.add("hit");
           const cloneSVG = hitSVG.cloneNode(true);
           currentCell.appendChild(cloneSVG);
         });
+        if (enemyStreakArr.length > 0) {
+          // visual effect that higlights the strike
+          // make sure that it is an async function that has a half second delay.
+        }
       }
       playerName.textContent = `Player ${playerClass.number} Turn`;
       // build the strike grid && populate previous strikes if applicable
@@ -509,43 +506,40 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           const c = Number(e.currentTarget.dataset.c);
           coord = [r, c];
           // replace this fn with checker for repeat strikes
-          console.log(coord);
-          // this might break if player canstrike is refactored
           const canStrike = playerClass.canStrike(
             coord,
             enemyClass.playerBoard,
           );
           if (canStrike && !tookTurn) {
-            tookTurn = true;
             // send signal to strike to gameTurn
             // response will return obj with .hitReport & .isSunk
             const response = gameTurnScript(playerClass, enemyClass, coord);
-            const nextBtn = document.createElement("button");
+            let nextBtn;
+
+            nextBtn = document.createElement("button");
             strikeResultCont.textContent =
               strikeResultCont.textContent + ": " + response.hitReport;
             nextBtn.textContent = "End Turn";
-            pageContainer.appendChild(nextBtn);
 
             if (response.hitReport === "miss") {
+              pageContainer.appendChild(nextBtn);
+              tookTurn = true;
               cell.classList.add("miss");
               const cloneSVG = missSvg.cloneNode(true);
               cell.appendChild(cloneSVG);
-              console.dir(playerClass);
             } else if (response.hitReport === undefined) {
               console.error("Error: strike response exception");
               return;
             } else {
+              //streakArr will allow for visual of hits received from previous player
+              enemyClass.playerBoard.streakArr.push(coord);
               cell.classList.add("hit");
               const cloneSVG = hitSVG.cloneNode(true);
               cell.appendChild(cloneSVG);
-              console.dir(playerClass);
             }
 
             nextBtn.addEventListener("click", () => {
               resolve();
-              console.log(
-                "there should be some resolving of promises happening right now",
-              );
             });
           }
         });
