@@ -462,6 +462,8 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         const missArr = playerClass.strikes.misses;
         const hitsArr = playerClass.strikes.hits;
         const enemyStreakArr = enemyClass.playerBoard.streakArr;
+        const delay = (timeout) =>
+          new Promise((res) => setTimeout(res, timeout));
         // for viewing which of your ships are hit, passthrough enemyClass instead of current player
         if (hitsOnly === false) {
           missArr.forEach((coordPair) => {
@@ -473,6 +475,12 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             currentCell.appendChild(cloneSVG);
           });
         }
+
+        async function asyncController(timeout, callbackfn) {
+          await delay(timeout);
+          callbackfn();
+        }
+
         hitsArr.forEach((coordPair) => {
           const currentCell = document.querySelector(
             `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
@@ -482,8 +490,22 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           currentCell.appendChild(cloneSVG);
         });
         if (enemyStreakArr.length > 0) {
+          const streakSequence = async (point) => {
+            const currentCell = document.querySelector(
+              `.${gridContainerName} [data-r="${point[0]}"][data-c="${point[1]}"]`,
+            );
+            const timeout = 400;
+            await delay(timeout);
+            currentCell.classList.add("streakHit");
+            await delay(timeout);
+            currentCell.classList.remove("streakHit");
+          };
           // visual effect that higlights the strike
           // make sure that it is an async function that has a half second delay.
+          enemyStreakArr.forEach((hit) => {
+            const current = enemyStreakArr.shift();
+            asyncController(500, streakSequence(current));
+          });
         }
       }
       playerName.textContent = `Player ${playerClass.number} Turn`;
@@ -635,7 +657,15 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       gameInitScript();
     });
   }
-  return { startScreen, pObjInitializer, strikeScreen };
+  function gameOverScreen() {
+    // get reference to the page container
+    // clear the page
+    // say game over and who won the game
+    // have a button that will reset the game
+    // alternatively you could not clear the screen and then just use modals to make it appear
+    // the modal would be a form with the reset button acting as the submit for the form.
+  }
+  return { startScreen, pObjInitializer, strikeScreen, gameOverScreen };
 };
 
 module.exports = userInterface;
