@@ -1,5 +1,5 @@
-// index houses the driver code including the game loop
-const player = require("./player");
+// index houses the driver code including the game loop const
+player = require("./player");
 const gameBoard = require("./gameboard");
 const ship = require("./ship");
 const cpu = require("./cpuPlayer");
@@ -23,7 +23,7 @@ const gameModule = () => {
 
       if (strikeResult.hitReport !== "miss") {
         cpuAI.reportHit(nextStrike, strikeResult.isSunk);
-        enemyBoard.streakArr.push(nextStrike);
+        playerClass.playerBoard.streakArr.push(nextStrike);
 
         return attack();
       } else if (strikeResult.hitReport === "miss") {

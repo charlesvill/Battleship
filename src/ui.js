@@ -492,7 +492,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         if (enemyStreakArr.length > 0) {
           const streakSequence = async (point) => {
             const currentCell = document.querySelector(
-              `.${gridContainerName} [data-r="${point[0]}"][data-c="${point[1]}"]`,
+              `.shipPlacedGrid [data-r="${point[0]}"][data-c="${point[1]}"]`,
             );
             const timeout = 400;
             await delay(timeout);
@@ -501,10 +501,11 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             currentCell.classList.remove("streakHit");
           };
           // visual effect that higlights the strike
-          // make sure that it is an async function that has a half second delay.
           enemyStreakArr.forEach((hit) => {
             const current = enemyStreakArr.shift();
-            asyncController(500, streakSequence(current));
+            asyncController(500, () => {
+              streakSequence(current);
+            });
           });
         }
       }
@@ -554,7 +555,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
               return;
             } else {
               //streakArr will allow for visual of hits received from previous player
-              enemyClass.playerBoard.streakArr.push(coord);
+              playerClass.playerBoard.streakArr.push(coord);
               cell.classList.add("hit");
               const cloneSVG = hitSVG.cloneNode(true);
               cell.appendChild(cloneSVG);
