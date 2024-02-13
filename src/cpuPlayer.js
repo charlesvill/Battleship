@@ -55,7 +55,7 @@ const cpuPlayer = () => {
     }
   }
 
-  function inlineMove() {
+  function inlineMove(reset) {
     // finds the axis by comparing hits and calls an inline guess
     if (pursuitAxis === null) {
       const [c1, c2] = hitArr;
@@ -67,13 +67,13 @@ const cpuPlayer = () => {
         return getNextInline(c2);
       }
     } else {
-      if (streak === false) {
+      if (streak === false || reset === true) {
         return getNextInline(hitArr[0]);
       }
       return getNextInline(hitArr[hitArr.length - 1]);
     }
   }
-  function nextMove() {
+  function nextMove(reset = false) {
     switch (state) {
       case "random":
         return randomMove();
@@ -82,7 +82,7 @@ const cpuPlayer = () => {
         return adjacentMove();
         break;
       case "inline":
-        return inlineMove();
+        return inlineMove(reset);
         break;
       default:
         return "Error condition exception: nextMove";
