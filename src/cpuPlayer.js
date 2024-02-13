@@ -45,6 +45,7 @@ const cpuPlayer = () => {
     const offsetValue = binaryOffset === 0 ? -1 : 1;
     let inlineStrike = [...lastHit];
 
+    // incremented by 1 instead of the offset value as a test.
     if (pursuitAxis === "h") {
       inlineStrike[1] += offsetValue;
       return inlineStrike;
@@ -70,7 +71,6 @@ const cpuPlayer = () => {
         return getNextInline(hitArr[0]);
       }
       return getNextInline(hitArr[hitArr.length - 1]);
-      // condition if the last strike was a miss then start from the front of the list
     }
   }
   function nextMove() {

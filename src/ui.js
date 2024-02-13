@@ -456,7 +456,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         hitSVG,
         missSvg,
         gridCont,
-        hitsOnly = false,
+        shipGrid = false,
       ) {
         const gridContainerName = gridCont.classList.value;
         const missArr = playerClass.strikes.misses;
@@ -465,7 +465,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         const delay = (timeout) =>
           new Promise((res) => setTimeout(res, timeout));
         // for viewing which of your ships are hit, passthrough enemyClass instead of current player
-        if (hitsOnly === false) {
+        if (shipGrid === false) {
           missArr.forEach((coordPair) => {
             const currentCell = document.querySelector(
               `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
@@ -476,9 +476,12 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           });
         }
 
-        async function asyncController(timeout, callbackfn) {
-          await delay(timeout);
-          callbackfn();
+        async function asyncController(timeout, arr, callbackfn) {
+          while (arr.length > 0) {
+            const current = arr.shift();
+            callbackfn(current);
+            await delay(timeout);
+          }
         }
 
         hitsArr.forEach((coordPair) => {
@@ -489,7 +492,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           const cloneSVG = hitSVG.cloneNode(true);
           currentCell.appendChild(cloneSVG);
         });
-        if (enemyStreakArr.length > 0) {
+        if (enemyStreakArr.length > 0 && shipGrid === true) {
           const streakSequence = async (point) => {
             const currentCell = document.querySelector(
               `.shipPlacedGrid [data-r="${point[0]}"][data-c="${point[1]}"]`,
@@ -501,12 +504,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             currentCell.classList.remove("streakHit");
           };
           // visual effect that higlights the strike
-          enemyStreakArr.forEach((hit) => {
-            const current = enemyStreakArr.shift();
-            asyncController(500, () => {
-              streakSequence(current);
-            });
-          });
+          asyncController(400, enemyStreakArr, streakSequence);
         }
       }
       playerName.textContent = `Player ${playerClass.number} Turn`;
