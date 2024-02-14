@@ -18,6 +18,34 @@
     align-items: center;
     max-height: 100vh;
 }
+.title{
+  font-weight: bold;
+  font-size: 2.5rem;
+}
+.playerSelectCont{
+  padding: 1rem;
+  background-color: #A36437;
+  display: flex;
+  width: 90%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.countryBox{
+  border: 1px solid black;
+  text-align: center;
+  color:black;
+
+}
+.countryBox:hover{
+  background-color:khaki;
+
+}
+.beginBtn{
+  border-radius: 5px;
+  background-color: maroon;
+}
 .header{
     background-color: #2A150D;
     display: flex;
@@ -37,6 +65,18 @@
 
     background-color: khaki;
 }
+.bodyCont{
+  padding: 1.5rem;
+  display: flex;
+  gap: 2rem;
+  background-color: #A36437;
+}
+.orientationBtn, .randomBtn, nextBtn{
+  border-radius: 5px;
+  background-color: maroon;
+  font-family: inherit;
+}
+
 .playerName{
     color:antiquewhite;
     text-align: center;
@@ -153,4 +193,27 @@
 
 .streakHit{
   background-color: yellow;
+}
+.gameOverCont{
+  display: flex;
+  flex-direction: column;
+  background-color: #723B25;
+  padding: 5rem;
+  justify-content: center;
+  align-items: center;
+}
+.gameOverText{
+  color: antiquewhite;
+  font-weight: bold;
+}
+.winnerType{
+  color: maroon;
+}
+.gameOverBtn{
+  border-radius: 10px;
+  background-color: #D1BA9B;
+  color:brown;
+}
+.gameOverBtn:hover{
+  background-color: antiquewhite;
 }
