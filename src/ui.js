@@ -2,8 +2,8 @@ const player = require("./player");
 
 const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
   const pageContainer = document.querySelector(".pageContainer");
-  let p1Country = "";
-  let p2Country = "";
+  let p1Country;
+  let p2Country;
 
   function initCountrySelect() {
     const nodeList = document.querySelectorAll(".countryBox");
@@ -34,7 +34,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     const playerobj = {
       player: undefined,
       number: undefined,
-      country: undefined,
+      country: "",
       ships: [manowar, frigate, frigate, schooner, schooner, sloop, sloop],
     };
     const player1 = { ...playerobj };
@@ -158,7 +158,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       // clear page container and populate with ship select
       const htmlContent = `
       <div class="shipScreenCont">
-          <div class="headerCont">
+          <div class="header">
               <div class="playerName">
               </div>
           </div>
@@ -167,7 +167,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
 
               </div>
               <div class="shipDisplayCont">
-                  this will be all boats listed and interactable
+                Either drag and drop or select random placement!
                 <div class="shipBox">
                     <div class="ship" data-index="5" draggable="true"></div>
                     <span class="shipCount man" draggable="false"></span>
@@ -404,6 +404,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             sloopCount <= 0
           ) {
             const nextBtn = document.createElement("button");
+            nextBtn.classlist.add("nextBtn");
             nextBtn.textContent = "Next";
             pageContainer.appendChild(nextBtn);
 
@@ -453,12 +454,15 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
       const strikeResultPlayer = document.querySelector(
         ".activityText.currentPlayer",
       );
-      const playerDisplayFaction =
-        playerClass.country === ""
-          ? `Player ${playerClass.number}`
-          : playerClass.country;
+      let playerDisplayFaction;
+      if (playerClass.country === "" || playerClass.country === undefined) {
+        playerDisplayFaction = `Player ${playerClass.number}`;
+      } else {
+        playerDisplayFaction = playerClass.country;
+      }
       const playerDisplayType =
         playerClass.player[0].toUpperCase() + playerClass.player.slice(1);
+      const activityScreenCont = document.querySelector(".activityScreenCont");
       const shipRemainText = document.querySelector(".shipsRemainCont");
       const gridSize = 10;
       const gridContainer = document.querySelector(".strikeGridCont");
@@ -487,16 +491,16 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
         const delay = (timeout) =>
           new Promise((res) => setTimeout(res, timeout));
         // for viewing which of your ships are hit, passthrough enemyClass instead of current player
-        if (shipGrid === false) {
-          missArr.forEach((coordPair) => {
-            const currentCell = document.querySelector(
-              `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
-            );
-            currentCell.classList.add("miss");
-            const cloneSVG = missSvg.cloneNode(true);
-            currentCell.appendChild(cloneSVG);
-          });
-        }
+        //if (shipGrid === false) {
+        missArr.forEach((coordPair) => {
+          const currentCell = document.querySelector(
+            `.${gridContainerName} [data-r="${coordPair[0]}"][data-c="${coordPair[1]}"]`,
+          );
+          currentCell.classList.add("miss");
+          const cloneSVG = missSvg.cloneNode(true);
+          currentCell.appendChild(cloneSVG);
+        });
+        //}
 
         async function asyncController(timeout, arr, callbackfn) {
           while (arr.length > 0) {
@@ -569,7 +573,7 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             nextBtn.textContent = "End Turn";
 
             if (response.hitReport === "miss") {
-              pageContainer.appendChild(nextBtn);
+              activityScreenCont.appendChild(nextBtn);
               tookTurn = true;
               cell.classList.add("miss");
               const cloneSVG = missSvg.cloneNode(true);
@@ -607,7 +611,12 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
   }
   async function startScreen() {
     const htmlContent = `
+
+          <div class="header">
+            <button class="resetBtn" onclick="location.reload();">reset</button>
+        </div>
       <div class="title">Battleship</div>
+
               <div class="playerSelectCont">
                  <form action="" class="playerForm">
                       <div class="pSelect p1">
@@ -624,15 +633,15 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
                               <div class="countryBox p1" id="Denmark">DK</div>
                               <div class="countryBox p1" id="UK">UK</div>
                               <div class="countryBox p1" id="Portugal">PT</div>
-                              <div class="countryBox p1" id="Spain">PT</div>
-                              <div class="countryBox p1" id="Italy">PT</div>
-                              <div class="countryBox p1" id="French">PT</div>
-                              <div class="countryBox p1" id="Dutch">PT</div>
+                              <div class="countryBox p1" id="Spain">ES</div>
+                              <div class="countryBox p1" id="Italy">IT</div>
+                              <div class="countryBox p1" id="French">FR</div>
+                              <div class="countryBox p1" id="Dutch">NL</div>
                           </div>
                       </div>
                       <div class="pSelect p2">
                           <div class="countryName p2"></div>
-                          <div class="pTxt p2">Player 1</div>
+                          <div class="pTxt p2">Player 2</div>
                           <div class="selectDropdown p2">
                               <select id="selectp2" name="select">
                                   <option value="person" selected>Player</option>
@@ -644,15 +653,14 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
                               <div class="countryBox p2" id="Denmark">DK</div>
                               <div class="countryBox p2" id="UK">UK</div>
                               <div class="countryBox p2" id="Portugal">PT</div>
-                              <div class="countryBox p2" id="Spain">PT</div>
-                              <div class="countryBox p2" id="Italy">PT</div>
-                              <div class="countryBox p2" id="French">PT</div>
-                              <div class="countryBox p2" id="Dutch">PT</div>
+                              <div class="countryBox p2" id="Spain">ES</div>
+                              <div class="countryBox p2" id="Italy">IT</div>
+                              <div class="countryBox p2" id="French">FR</div>
+                              <div class="countryBox p2" id="Dutch">NL</div>
                           </div>
                       </div>
-                      <div class="btnCont">
-                          <button type="submit">Begin</button>
-                      </div>
+                      <div class="pselectErrorMsg"></div>
+                       <button type="submit" class="beginBtn">Begin</button>
                  </form>
 
               </div>
@@ -664,31 +672,53 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
     initCountrySelect();
     playerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      const player1Type = document.getElementById("selectp1");
+      const player2Type = document.getElementById("selectp2");
+      let legalPlayers = true;
       const players = pObjInitializer(".playerForm", "selectp1", "selectp2");
+      const errorMsg = document.querySelector(".pselectErrorMsg");
+      if (player1Type.value !== "person" && player2Type.value !== "person") {
+        legalPlayers = false;
+        errorMsg.textContent = "Atleast one player needs to be a person!";
+      }
       // playerobj sent back to extend functionality with player script
-      async function processPlayers(players) {
-        for (const element of players) {
-          if (element.player === "person") {
-            playerInitScript(element);
-            await shipScreen(element);
-          } else {
-            playerInitScript(element);
-            shipRandomizer(element);
+
+      if (legalPlayers === true) {
+        async function processPlayers(players) {
+          for (const element of players) {
+            if (element.player === "person") {
+              playerInitScript(element);
+              await shipScreen(element);
+            } else {
+              playerInitScript(element);
+              shipRandomizer(element);
+            }
           }
         }
+        await processPlayers(players);
+        // this passes over control back to the index script.
+        gameInitScript();
       }
-      await processPlayers(players);
-      // this passes over control back to the index script.
-      gameInitScript();
     });
   }
-  function gameOverScreen() {
+  function gameOverScreen(winnerFaction, winnerType) {
+    // type is if person or CPU
     // get reference to the page container
-    // clear the page
-    // say game over and who won the game
-    // have a button that will reset the game
-    // alternatively you could not clear the screen and then just use modals to make it appear
-    // the modal would be a form with the reset button acting as the submit for the form.
+    const pageContainer = document.querySelector(".pageContainer");
+
+    pageContainer.innerHTML = "";
+    pageContainer.innerHTML = `
+<div class="gameOverCont">
+  <div class="gameOverText"></div>
+  <div class="winnerType"></div>
+  <button class="gameOverBtn" onclick="location.reload();">Play Again?</div>
+</div>
+`;
+    pageContainer.classList.add("gameOverScreen");
+    const gameOverContainer = document.querySelector(".gameOverCont");
+    const gameOverText = document.querySelector(".gameOverText");
+    const winnerPlayer = document.querySelector(".winnerType");
+    gameOverText.textContent = `${winnerFaction} has Won!`;
   }
   return { startScreen, pObjInitializer, strikeScreen, gameOverScreen };
 };

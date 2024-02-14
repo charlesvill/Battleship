@@ -92,13 +92,11 @@ const gameModule = () => {
     const response = playerClass.attack(coordinates, enemyClass.playerBoard);
     const shipCheck = enemyClass.playerBoard.shipsRemaining();
     console.log(shipCheck);
-    if (gameOver) {
-      return endGame();
-    }
     // return value anything other than num = game over
     if (isNaN(shipCheck)) {
       gameOver = true;
-      return endGame();
+      endGame(enemyClass.country, enemyClass.player);
+      return;
     }
     return response;
   }
@@ -150,10 +148,10 @@ const gameModule = () => {
   let gameOver = false;
   ui.startScreen();
 
-  function endGame(winner) {
+  function endGame(winnerFaction, winnerType) {
     // some shit here to end the game
-    console.log("this mf over lol");
-    return isGameOver();
+    console.log("the game over foos");
+    ui.gameOverScreen(winnerFaction, winnerType);
   }
 
   function isGameOver() {
