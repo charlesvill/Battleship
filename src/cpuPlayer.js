@@ -36,7 +36,6 @@ const cpuPlayer = () => {
       const redo = adjacentMove();
       adjacentStrike = redo;
     }
-
     return adjacentStrike;
   }
 
@@ -48,11 +47,19 @@ const cpuPlayer = () => {
     // incremented by 1 instead of the offset value as a test.
     if (pursuitAxis === "h") {
       inlineStrike[1] += offsetValue;
-      return inlineStrike;
     } else if (pursuitAxis === "v") {
       inlineStrike[0] += offsetValue;
-      return inlineStrike;
     }
+    if (
+      inlineStrike[0] < 0 ||
+      inlineStrike[0] > 9 ||
+      inlineStrike[1] < 0 ||
+      inlineStrike[1] > 9
+    ) {
+      const redo = getNextInline(lastHit);
+      inlineStrike = redo;
+    }
+    return inlineStrike;
   }
 
   function inlineMove(reset) {
