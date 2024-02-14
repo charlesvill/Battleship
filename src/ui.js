@@ -418,26 +418,48 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
   // gameTurn requires coordinates, playerClass, enemyClass
   async function strikeScreen(playerClass, enemyClass, gameTurnScript) {
     return new Promise((resolve) => {
-      const htmlContent = ` <div class="header">
-          <div class="playerName"></div>
+      const htmlContent = `
+      <div class="header">
+      <button class="resetBtn" onclick="location.reload();">reset</button>
+      <div class="playerName"></div>
+      <div class="spacing"></div>
        </div>
-       <div class="strikeCont">
-           <div class="strikeGridCont">
-               <span class="strikeResult">Strike Result</span>
-           </div>
-           <div class="shipPlacedCont">
-               <div class="shipPlacedGrid"></div>
-               <div class="shipsRemainCont"></div>
-           </div>
-       </div>
-       <div class="footer">
-       </div>
+        <div class="strikeCont">
+        <div class="grids">
+            <div class="strikeGridCont">
+            </div>
+            <div class="shipPlacedCont">
+                <div class="shipPlacedGrid"></div>
+                <div class="shipsRemainCont"></div>
+            </div>
+        </div>
+        <div class="activityScreenCont">
+            <div class="activityScreen">
+                <span class="activityText">
+                </span>
+                <span class="activityText currentPlayer">
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+    </div>
       `;
       pageContainer.innerHTML = "";
       pageContainer.innerHTML = htmlContent;
 
       const playerName = document.querySelector(".playerName");
-      const strikeResultCont = document.querySelector(".strikeResult");
+      const strikeResultCont = document.querySelector(".activityText");
+      const strikeResultPlayer = document.querySelector(
+        ".activityText.currentPlayer",
+      );
+      const playerDisplayFaction =
+        playerClass.country === ""
+          ? `Player ${playerClass.number}`
+          : playerClass.country;
+      const playerDisplayType =
+        playerClass.player[0].toUpperCase() + playerClass.player.slice(1);
+      const shipRemainText = document.querySelector(".shipsRemainCont");
       const gridSize = 10;
       const gridContainer = document.querySelector(".strikeGridCont");
       const shipPlaceGrid = document.querySelector(".shipPlacedGrid");
@@ -507,7 +529,11 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
           asyncController(400, enemyStreakArr, streakSequence);
         }
       }
+
       playerName.textContent = `Player ${playerClass.number} Turn`;
+      strikeResultCont.textContent = playerDisplayFaction;
+      strikeResultPlayer.textContent = playerDisplayType;
+      shipRemainText.textContent = `Ships remaining: ${playerClass.playerBoard.shipsRemaining()} `;
       // build the strike grid && populate previous strikes if applicable
       gridBuilder(gridContainer, 10);
       // build the shipPlacedGrid
@@ -538,8 +564,8 @@ const userInterface = (shipMakerProxy, playerInitScript, gameInitScript) => {
             let nextBtn;
 
             nextBtn = document.createElement("button");
-            strikeResultCont.textContent =
-              strikeResultCont.textContent + ": " + response.hitReport;
+            strikeResultCont.textContent = `${playerDisplayFaction} ${response.hitReport} !`;
+
             nextBtn.textContent = "End Turn";
 
             if (response.hitReport === "miss") {
