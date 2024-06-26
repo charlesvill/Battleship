@@ -1,2 +1,4 @@
 # Battleship
-Test Driven workflow using JEST to implement the game of Battleship against a computer or another player.
+The game of Battleship against a computer or another player.
+
+Demonstrates factory functions and JEST test driven workflow.
